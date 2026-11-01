@@ -1,0 +1,2 @@
+Target dependency graph (1 target)
+Target 'Muzic2App' in project 'Muzic2App' (no dependencies)

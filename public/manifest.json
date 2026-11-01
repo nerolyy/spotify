@@ -1,0 +1,87 @@
+{
+  "name": "Muzic2 — Музыкальный сервис",
+  "short_name": "Muzic2",
+  "description": "Современный музыкальный сервис с караоке режимом",
+  "start_url": "/muzic2/public/index.php",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#1db954",
+  "orientation": "portrait-primary",
+  "scope": "/muzic2/",
+  "icons": [
+    {
+      "src": "/muzic2/public/assets/img/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/muzic2/public/assets/img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Поиск",
+      "short_name": "Поиск",
+      "description": "Быстрый поиск музыки",
+      "url": "/muzic2/public/index.php?page=search",
+      "icons": [{ "src": "/muzic2/public/assets/img/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Моя музыка",
+      "short_name": "Моя музыка",
+      "description": "Избранные треки и плейлисты",
+      "url": "/muzic2/public/index.php?page=library",
+      "icons": [{ "src": "/muzic2/public/assets/img/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Регистрация Muzic2</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f7fb; margin: 0; padding: 0; }
+    .wrap { max-width: 420px; margin: 40px auto; background: #fff; padding: 24px 28px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    h1 { margin: 0 0 16px; font-size: 22px; text-align: center; }
+    label { display: block; margin: 12px 0 6px; font-weight: bold; }
+    input { width: 100%; padding: 10px 12px; border: 1px solid #d3d9e4; border-radius: 8px; font-size: 14px; }
+    button { width: 100%; padding: 12px; margin-top: 18px; background: #4a7afe; color: #fff; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; }
+    button:hover { background: #3b68e0; }
+    .msg { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .msg.ok { background: #e6f6ed; color: #207544; border: 1px solid #b7e2c8; }
+    .msg.err { background: #ffecec; color: #a40000; border: 1px solid #f5c2c2; }
+    table { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 14px; }
+    th, td { border: 1px solid #e2e6ef; padding: 8px; text-align: left; }
+    th { background: #f0f2f8; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Регистрация</h1>
+    <form id="regForm">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="username">Логин</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="password">Пароль</label>
+      <input type="password" id="password" name="password" minlength="6" required>
+
+      <button type="submit">Создать аккаунт</button>
+    </form>
+    <div id="msg" class="msg"></div>
+
+    <table id="resultTable" style="display:none;">
+      <thead>
+        <tr><th>Поле</th><th>Значение</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById('regForm');
+    const msg = document.getElementById('msg');
+    const table = document.getElementById('resultTable');
+    const tbody = table.querySelector('tbody');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.style.display = 'none';
+      table.style.display = 'none';
+      tbody.innerHTML = '';
+
+      const payload = {
+        email: form.email.value.trim(),
+        username: form.username.value.trim(),
+        password: form.password.value
+      };
+
+      try {
+        const apiUrl = `${window.location.origin}/muzic2/src/api/register.php`;
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('Некорректный ответ сервера (ожидался JSON)');
+        }
+        if (!res.ok || data.error) {
+          throw new Error(data.error || 'Ошибка регистрации');
+        }
+        msg.className = 'msg ok';
+        msg.textContent = 'Пользователь создан';
+        msg.style.display = 'block';
+
+        // Показать введенные данные в таблице (без пароля)
+        tbody.innerHTML = `
+          <tr><td>Email</td><td>${payload.email}</td></tr>
+          <tr><td>Логин</td><td>${payload.username}</td></tr>
+        `;
+        table.style.display = 'table';
+        form.reset();
+      } catch (err) {
+        msg.className = 'msg err';
+        msg.textContent = err.message || 'Ошибка';
+        msg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
+

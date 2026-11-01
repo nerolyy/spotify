@@ -1,0 +1,23 @@
+# Build outputs
+macos/build/
+windows/bin/
+windows/obj/
+windows/publish/
+
+# DMG files
+*.dmg
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# macOS
+.DS_Store
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+desktop.ini
+

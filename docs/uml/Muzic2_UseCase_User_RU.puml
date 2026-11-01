@@ -1,0 +1,80 @@
+@startuml
+scale max 950 width
+skinparam defaultFontSize 9
+skinparam usecaseFontSize 9
+skinparam shadowing false
+title Muzic2 - функции для пользователя
+
+left to right direction
+
+actor "Пользователь" as U
+
+rectangle "Веб-сервис Muzic2" {
+
+  package "Вход" {
+    usecase U1 as "Войти"
+    usecase U2 as "Регистрация"
+    usecase U3 as "Выйти"
+  }
+
+  package "Главная" {
+    usecase U4 as "Подборки и каталог"
+    usecase U5 as "Пульс"
+    usecase U6 as "Продолжить слушать"
+  }
+
+  package "Поиск" {
+    usecase U7 as "Искать треки"
+    usecase U8 as "Искать альбомы"
+    usecase U9 as "Искать артистов"
+  }
+
+  package "Моя музыка" {
+    usecase U10 as "Любимые треки"
+    usecase U11 as "Любимые альбомы"
+    usecase U12 as "Создать плейлист"
+    usecase U13 as "Открыть плейлист"
+    usecase U14 as "Удалить плейлист"
+    usecase U15 as "Трек в плейлист"
+  }
+
+  package "Карточки" {
+    usecase U16 as "Страница альбома"
+    usecase U17 as "Страница артиста"
+  }
+
+  package "Плеер" {
+    usecase U18 as "Слушать"
+    usecase U19 as "Очередь"
+    usecase U20 as "Текст и караоке"
+    usecase U21 as "Лайк при прослушивании"
+  }
+}
+
+U --> U1
+U --> U2
+U --> U3
+U --> U4
+U --> U5
+U --> U6
+U --> U7
+U --> U8
+U --> U9
+U --> U10
+U --> U11
+U --> U12
+U --> U13
+U --> U14
+U --> U15
+U --> U16
+U --> U17
+U --> U18
+U --> U19
+U --> U20
+U --> U21
+
+U5 ..> U18 : include
+U16 ..> U18 : include
+U12 ..> U1 : include
+
+@enduml

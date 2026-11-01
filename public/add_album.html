@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Добавление нового альбома</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-2: #764ba2;
+            --danger: #dc3545;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #333;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+                Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+            color: var(--text);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        h1 {
+            margin: 0 0 16px;
+            text-align: center;
+        }
+        .subtitle {
+            margin: 0 0 24px;
+            text-align: center;
+            color: var(--muted);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            background: #fff;
+        }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: #374151; }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .2s ease;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .covers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .cover-option {
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: all .2s ease;
+            text-align: center;
+        }
+        .cover-option:hover { border-color: var(--primary); background: #f3f4ff; }
+        .cover-option.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(102,126,234,0.12); }
+        .cover-option img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+        .cover-option .name { margin-top: 6px; font-size: 13px; color: #374151; }
+
+        .tracks-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .tracks-table thead {
+            background: #f9fafb;
+        }
+        .tracks-table th, .tracks-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: middle;
+        }
+        .tracks-table th { font-size: 13px; color: #4b5563; }
+        .tracks-table td input {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        .col-num { width: 48px; text-align: center; color: var(--primary); font-weight: 700; }
+        .col-dur { width: 160px; }
+        .col-actions { width: 70px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform .1s ease, opacity .2s ease, background .2s ease;
+        }
+        .btn:hover { transform: translateY(-1px); }
+        .btn.secondary { background: #111827; }
+        .btn.ghost { background: #eef2ff; color: #4338ca; }
+        .btn.danger { background: var(--danger); }
+        .btn.small { padding: 8px 10px; border-radius: 8px; }
+
+        .row-actions { display: flex; gap: 8px; }
+        .muted { color: var(--muted); font-size: 13px; }
+        .note { background: #ecfeff; border: 1px dashed #22d3ee; padding: 10px; border-radius: 8px; font-size: 13px; }
+        .spacer { height: 10px; }
+        .success { background: #ecfdf5; border: 1px solid #10b981; color: #065f46; padding: 10px 12px; border-radius: 8px; }
+        .error { background: #fef2f2; border: 1px solid #ef4444; color: #991b1b; padding: 10px 12px; border-radius: 8px; }
+
+        /* Upload UI */
+        .upload-area {
+            background: #f9fafb;
+            border: 1px dashed var(--border);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 10px 0 12px;
+        }
+        .upload-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Добавить новый альбом</h1>
+        <p class="subtitle">Заполните данные альбома и треков. После отправки он появится на сайте.</p>
+
+        <div class="grid" style="margin-bottom: 16px;">
+            <div class="card" style="grid-column: span 12;">
+                <div class="note">
+                    Советы: указывайте пути к файлам относительно корня проекта, например <code>tracks/music/artist/song.mp3</code> и обложки из <code>tracks/covers/</code>.
+                </div>
+            </div>
+        </div>
+
+        <form id="albumForm">
+            <div class="grid">
+                <div class="card" style="grid-column: span 12;">
+                    <div class="form-group">
+                        <label for="albumName">Название альбома *</label>
+                        <input id="albumName" name="albumName" type="text" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="artistName">Имя артиста *</label>
+                        <input id="artistName" name="artistName" type="text" required />
+                    </div>
+                    <div class="grid">
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label for="albumType">Тип альбома *</label>
+                            <select id="albumType" name="albumType" required>
+                                <option value="album">Альбом</option>
+                                <option value="ep">EP</option>
+                                <option value="single">Сингл</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 4;">
+                            <label for="releaseYear">Год выпуска</label>
+                            <input id="releaseYear" name="releaseYear" type="number" min="1900" max="2099" value="2024" />
+                        </div>
+                        <div class="form-group" style="grid-column: span 12;">
+                            <label for="description">Описание</label>
+                            <textarea id="description" name="description" rows="3" placeholder="Краткое описание альбома (необязательно)"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="grid-column: span 12;">
+                    <label>Выберите обложку *</label>
+                    <input type="hidden" id="selectedCover" name="selectedCover" required />
+
+                    <!-- Upload your own cover -->
+                    <div class="upload-area">
+                        <div class="form-group" style="margin:0;">
+                            <label for="coverFile" style="margin-bottom:8px;">Загрузите свою обложку (JPG, PNG, WEBP, GIF, до 15 МБ)</label>
+                            <input type="file" id="coverFile" accept="image/*" />
+                        </div>
+                        <div class="upload-actions">
+                            <button type="button" class="btn" id="uploadBtn">Загрузить</button>
+                            <span class="muted">После загрузки обложка автоматически выберется</span>
+                        </div>
+                        <div id="uploadStatus" class="muted" style="margin-top:6px;"></div>
+                        <div id="uploadedPreview" style="display:none; margin-top:10px;">
+                            <img id="uploadedCoverImg" src="" alt="Загруженная обложка" style="width:160px; height:160px; object-fit:cover; border-radius:8px; border:1px solid var(--border);" />
+                            <div class="muted" id="uploadedCoverName" style="margin-top:6px;"></div>
+                        </div>
+                    </div>
+
+                    <p class="muted" style="margin:8px 0 4px;">Или выберите из существующих:</p>
+                    <div class="covers-grid" id="coversGrid">
+                        <div class="cover-option" data-cover="tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg">
+                            <img src="../tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg" alt="Kai Angel Cover" />
+                            <div class="name">Kai Angel Cover</div>
+                        </div>
+                        <div class="cover-option" data-cover="tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png">
+                            <img src="../tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png" alt="Screenshot 1" />
+                            <div class="name">Screenshot 1</div>
+                        </div>
+                        <div class="cover-option" data-cover="tracks/covers/Снимок экрана 2025-07-19 в 11.56.58.png">
+                            <img src="../tracks/covers/Снимок экрана 2025-07-19 в 11.56.58.png" alt="Screenshot 2" />
+                            <div class="name">Screenshot 2</div>
+                        </div>
+                        <div class="cover-option" data-cover="tracks/covers/Heavymetal2.webp.png">
+                            <img src="../tracks/covers/Heavymetal2.webp.png" alt="Heavy Metal" />
+                            <div class="name">Heavy Metal</div>
+                        </div>
+                        <div class="cover-option" data-cover="tracks/covers/m1000x1000.jpeg">
+                            <img src="../tracks/covers/m1000x1000.jpeg" alt="Default Cover" />
+                            <div class="name">Default Cover</div>
+                        </div>
+                        <div class="cover-option" data-cover="tracks/covers/Без названия (1).jpeg">
+                            <img src="../tracks/covers/Без названия (1).jpeg" alt="Untitled 1" />
+                            <div class="name">Untitled 1</div>
+                        </div>
+                    </div>
+                    <p class="muted" style="margin-top:8px;">Путь к обложке будет сохранён, например: <code>tracks/covers/...</code></p>
+                </div>
+
+                <div class="card" style="grid-column: span 12;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px;">
+                        <label>Треки альбома *</label>
+                        <button type="button" class="btn ghost" id="addTrackBtn">+ Добавить трек</button>
+                    </div>
+                    <table class="tracks-table" id="tracksTable">
+                        <thead>
+                            <tr>
+                                <th class="col-num">№</th>
+                                <th>Название трека</th>
+                                <th class="col-dur">Длительность (сек)</th>
+                                <th>Путь к файлу</th>
+                                <th class="col-actions">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tracksTbody">
+                        </tbody>
+                    </table>
+                    <div class="muted" style="margin-top:8px;">Пример пути к файлу: <code>tracks/music/artist/song.mp3</code></div>
+                </div>
+
+                <div class="card" style="grid-column: span 12;">
+                    <button type="submit" class="btn" id="submitBtn">🎉 Добавить альбом</button>
+                    <div class="spacer"></div>
+                    <div id="status"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const covers = document.querySelectorAll('.cover-option');
+        const selectedCoverInput = document.getElementById('selectedCover');
+        covers.forEach(c => c.addEventListener('click', () => {
+            covers.forEach(x => x.classList.remove('selected'));
+            c.classList.add('selected');
+            selectedCoverInput.value = c.dataset.cover;
+        }));
+
+        // Upload cover logic
+        const coverFileInput = document.getElementById('coverFile');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const uploadedPreview = document.getElementById('uploadedPreview');
+        const uploadedCoverImg = document.getElementById('uploadedCoverImg');
+        const uploadedCoverName = document.getElementById('uploadedCoverName');
+
+        function setUploadStatus(type, text) {
+            uploadStatus.className = type ? type : 'muted';
+            uploadStatus.textContent = text || '';
+        }
+
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', async () => {
+                if (!coverFileInput.files || !coverFileInput.files[0]) {
+                    setUploadStatus('error', 'Выберите файл обложки');
+                    return;
+                }
+                const file = coverFileInput.files[0];
+                const formData = new FormData();
+                formData.append('cover', file);
+                try {
+                    uploadBtn.disabled = true;
+                    uploadBtn.textContent = 'Загрузка...';
+                    setUploadStatus('muted', 'Загрузка...');
+                    const res = await fetch('upload_cover.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.success) throw new Error(data.message || 'Ошибка загрузки');
+                    const rel = data.path; // tracks/covers/...
+                    selectedCoverInput.value = rel;
+                    // снять выбор у готовых
+                    document.querySelectorAll('.cover-option').forEach(x => x.classList.remove('selected'));
+                    // показать превью загруженной
+                    uploadedCoverImg.src = '../' + rel;
+                    uploadedCoverName.textContent = data.filename;
+                    uploadedPreview.style.display = 'block';
+                    setUploadStatus('success', 'Обложка загружена и выбрана');
+                } catch (err) {
+                    setUploadStatus('error', '❌ ' + err.message);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = 'Загрузить';
+                }
+            });
+        }
+
+        const tbody = document.getElementById('tracksTbody');
+        const addTrackBtn = document.getElementById('addTrackBtn');
+
+        function addTrackRow(title = '', duration = '', file = '') {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="col-num"></td>
+                <td><input type="text" class="track-title" placeholder="Название трека" required value="${title}"></td>
+                <td class="col-dur"><input type="number" class="track-duration" min="1" placeholder="Напр. 180" required value="${duration}"></td>
+                <td><input type="text" class="track-file" placeholder="tracks/music/artist/song.mp3" required value="${file}"></td>
+                <td class="col-actions">
+                    <div class="row-actions">
+                        <button type="button" class="btn small danger" onclick="removeRow(this)">Удалить</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(row);
+            renumberRows();
+        }
+
+        function removeRow(btn) {
+            const tr = btn.closest('tr');
+            tr.remove();
+            renumberRows();
+        }
+
+        function renumberRows() {
+            [...tbody.querySelectorAll('tr')].forEach((tr, idx) => {
+                tr.querySelector('.col-num').textContent = idx + 1;
+            });
+        }
+
+        addTrackBtn.addEventListener('click', () => addTrackRow());
+        // стартовая строка
+        addTrackRow();
+
+        const form = document.getElementById('albumForm');
+        const statusEl = document.getElementById('status');
+
+        function setStatus(type, text) {
+            statusEl.className = type;
+            statusEl.textContent = text;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setStatus('', '');
+
+            const album_name = document.getElementById('albumName').value.trim();
+            const artist_name = document.getElementById('artistName').value.trim();
+            const album_type = document.getElementById('albumType').value;
+            const selectedCover = document.getElementById('selectedCover').value;
+            const release_year = parseInt(document.getElementById('releaseYear').value, 10) || new Date().getFullYear();
+            const description = document.getElementById('description').value.trim();
+
+            if (!album_name || !artist_name || !album_type) {
+                setStatus('error', 'Заполните обязательные поля: Название, Артист, Тип.');
+                return;
+            }
+            if (!selectedCover) {
+                setStatus('error', 'Выберите обложку.');
+                return;
+            }
+
+            const tracks = [];
+            for (const tr of tbody.querySelectorAll('tr')) {
+                const title = tr.querySelector('.track-title').value.trim();
+                const duration = parseInt(tr.querySelector('.track-duration').value, 10);
+                const file_path = tr.querySelector('.track-file').value.trim();
+                if (title && duration > 0 && file_path) {
+                    tracks.push({ title, duration, file_path, track_number: tracks.length + 1 });
+                }
+            }
+
+            if (tracks.length === 0) {
+                setStatus('error', 'Добавьте минимум один трек.');
+                return;
+            }
+
+            const payload = {
+                album_name,
+                artist_name,
+                album_type,
+                selectedCover,
+                release_year,
+                description,
+                tracks
+            };
+
+            try {
+                const res = await fetch('../add_album_api.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.message || 'Ошибка добавления');
+                setStatus('success', `🎉 Альбом добавлен: ${data.data.album_name} — треков: ${data.data.tracks_count}, длительность: ${data.data.total_duration}`);
+                form.reset();
+                // сброс обложки и таблицы треков
+                document.querySelectorAll('.cover-option').forEach(x => x.classList.remove('selected'));
+                selectedCoverInput.value = '';
+                document.getElementById('uploadedPreview').style.display = 'none';
+                document.getElementById('uploadStatus').textContent = '';
+                tbody.innerHTML = '';
+                addTrackRow();
+            } catch (err) {
+                setStatus('error', '❌ ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

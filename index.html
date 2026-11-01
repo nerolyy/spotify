@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muzic2 — Музыкальный сервис</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1db954;
+        }
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .nav button {
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav button:hover {
+            background: #555;
+        }
+        .content {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .loading {
+            font-size: 1.2em;
+            color: #1db954;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Muzic2</div>
+            <div class="nav">
+                <button onclick="loadPage('home')">Главная</button>
+                <button onclick="loadPage('search')">Поиск</button>
+                <button onclick="loadPage('library')">Моя музыка</button>
+            </div>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+
+    <script>
+        // Принудительно используем HTTP вместо HTTPS
+        if (location.protocol === 'https:') {
+            location.replace('http:' + location.href.substring(5));
+        }
+        
+        async function loadPage(page) {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                // Пробуем разные пути к API (используем public API, который не требует авторизацию)
+                const apiPaths = [
+                    'public/src/api/home.php',
+                    '/muzic2/public/src/api/home.php',
+                    '../public/src/api/home.php'
+                ];
+                
+                let data = null;
+                for (const path of apiPaths) {
+                    try {
+                        const response = await fetch(path);
+                        if (response.ok) {
+                            data = await response.json();
+                            break;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+                
+                if (data) {
+                    content.innerHTML = `
+                        <h2>Добро пожаловать в Muzic2!</h2>
+                        <p>Треков: ${data.tracks ? data.tracks.length : 0}</p>
+                        <p>Альбомов: ${data.albums ? data.albums.length : 0}</p>
+                        <p>Артистов: ${data.artists ? data.artists.length : 0}</p>
+                        <div style="margin:18px auto; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+                            <button id="db-export-btn" style="background:#1db954;color:#000;font-weight:700;">Экспорт БД</button>
+                            <button id="db-import-btn" style="background:#333;color:#fff;border:1px solid #555;">Импорт БД</button>
+                            <input id="db-import-file" type="file" accept="application/json" style="display:none">
+                        </div>
+                        <p><a href="public/index.php" style="color: #1db954;">Перейти к полной версии</a></p>
+                    `;
+
+                    // DB transfer buttons (requires logged-in session)
+                    const exportBtn = document.getElementById('db-export-btn');
+                    const importBtn = document.getElementById('db-import-btn');
+                    const importFile = document.getElementById('db-import-file');
+                    const apiBase = '/muzic2/public/src/api/db_transfer.php';
+
+                    if (exportBtn) exportBtn.onclick = async () => {
+                        try {
+                            exportBtn.disabled = true;
+                            exportBtn.textContent = 'Экспорт...';
+                            const res = await fetch(apiBase + '?action=export', { credentials: 'include' });
+                            const text = await res.text();
+                            let j = null; try { j = text ? JSON.parse(text) : null; } catch (_) { j = null; }
+                            if (!res.ok || !j || !j.success) {
+                                throw new Error((j && j.error) ? j.error : (text ? text.slice(0, 200) : 'export_failed'));
+                            }
+                            const blob = new Blob([JSON.stringify(j, null, 2)], { type: 'application/json' });
+                            const a = document.createElement('a');
+                            const ts = new Date().toISOString().replace(/[:.]/g, '-');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = 'muzic2-db-export-' + ts + '.json';
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                        } catch (e) {
+                            alert('Экспорт не удался. Ошибка: ' + (e && e.message ? e.message : 'unknown'));
+                        } finally {
+                            exportBtn.disabled = false;
+                            exportBtn.textContent = 'Экспорт БД';
+                        }
+                    };
+
+                    if (importBtn && importFile) importBtn.onclick = () => importFile.click();
+                    if (importFile) importFile.onchange = async () => {
+                        const f = importFile.files && importFile.files[0] ? importFile.files[0] : null;
+                        if (!f) return;
+                        try {
+                            importBtn.disabled = true;
+                            importBtn.textContent = 'Импорт...';
+                            const fd = new FormData();
+                            fd.append('file', f);
+                            const res = await fetch(apiBase + '?action=import', { method: 'POST', body: fd, credentials: 'include' });
+                            const text = await res.text();
+                            let j = null; try { j = text ? JSON.parse(text) : null; } catch (_) { j = null; }
+                            if (!res.ok || !j || !j.success) throw new Error((j && j.error) ? j.error : (text ? text.slice(0, 200) : 'import_failed'));
+                            alert('Импорт завершён: ' + JSON.stringify(j.imported || {}, null, 2));
+                            // reload stats
+                            loadPage('home');
+                        } catch (e) {
+                            alert('Импорт не удался. Нужно быть авторизованным. Ошибка: ' + (e && e.message ? e.message : 'unknown'));
+                        } finally {
+                            importBtn.disabled = false;
+                            importBtn.textContent = 'Импорт БД';
+                            importFile.value = '';
+                        }
+                    };
+                } else {
+                    content.innerHTML = '<div class="error">Не удалось загрузить данные</div>';
+                }
+            } catch (error) {
+                content.innerHTML = '<div class="error">Ошибка: ' + error.message + '</div>';
+            }
+        }
+        
+        // Загружаем главную страницу при старте
+        loadPage('home');
+    </script>
+</body>
+</html>

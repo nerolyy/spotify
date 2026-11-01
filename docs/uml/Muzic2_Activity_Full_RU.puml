@@ -1,0 +1,173 @@
+@startuml
+title Polnaya diagramma aktivnosti - Muzic2
+
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #FAFAFA
+skinparam activityFontSize 11
+skinparam partitionBackgroundColor #EEF7EE
+skinparam partitionBorderColor #1a9e4a
+
+|Pользователь|
+start
+:Открыть сайт /muzic2/public/;
+
+|Клиент app.js|
+:Редирект HTTPS на HTTP;
+:DOM ready;
+
+partition Инициализация {
+  :initSession();
+  fork
+    :GET user_windows.php;
+  fork again
+    :Чтение localStorage;
+  end fork
+  if (Авторизован?) then (нет)
+    |Пользователь|
+    :Экран входа;
+    |Клиент app.js|
+    if (Действие?) then (Вход)
+      :POST windows_auth login;
+    else (Регистрация)
+      :POST windows_auth register;
+    endif
+    if (Успешно?) then (нет)
+      :Показать ошибку;
+      stop
+    else (да)
+      :OK;
+    endif
+  else (да)
+    :Сессия активна;
+  endif
+  :showAuthenticatedContent;
+  :renderAuthHeader;
+  :navigateTo home;
+}
+
+|Pользователь|
+repeat
+:Работа в приложении;
+
+|Клиент app.js|
+if (Раздел?) then (Главная)
+
+  partition Главная {
+    :renderHome;
+    :GET home_windows.php;
+    :Секции каталога;
+    :Пульс и Hero;
+    :renderContinueListening;
+    |Пользователь|
+    if (Действие?) then (Пульс)
+      :startPulse;
+      :Очередь 30 треков;
+    elseif (Трек)
+      :playTrack;
+    elseif (Альбом)
+      :renderAlbumSPA;
+    elseif (Артист)
+      :renderArtistSPA;
+    elseif (Лайк)
+      :toggle like;
+    elseif (Меню)
+      :контекстное меню;
+    endif
+  }
+
+elseif (Поиск) then
+
+  partition Поиск {
+    :renderSearch;
+    |Пользователь|
+    :Ввод запроса;
+    |Клиент app.js|
+    :GET search_windows.php;
+    |Пользователь|
+    if (Клик?) then (Трек)
+      :playTrack;
+    elseif (Альбом)
+      :renderAlbumSPA;
+    else (Артист)
+      :renderArtistSPA;
+    endif
+  }
+
+elseif (Моя музыка) then
+
+  partition Моя_музыка {
+    :renderMyMusic;
+    fork
+      :GET playlists_windows;
+    fork again
+      :GET windows_likes;
+    end fork
+    |Пользователь|
+    if (Действие?) then (Плейлист)
+      :openPlaylist;
+    elseif (Создать)
+      :POST playlists create;
+    elseif (Удалить)
+      if (Любимые?) then (да)
+        :Запрет;
+      else (нет)
+        :POST delete;
+      endif
+    endif
+  }
+
+elseif (Альбом) then
+  partition Альбом {
+    :GET album_windows;
+    |Пользователь|
+    if (Действие?) then (Play)
+      :playTrack;
+    else (Лайк)
+      :windows_likes;
+    endif
+  }
+
+elseif (Артист) then
+  partition Артист {
+    :GET artist_windows;
+    |Пользователь|
+    if (Действие?) then (Play)
+      :playTrack;
+    else (Альбом)
+      :renderAlbumSPA;
+    endif
+  }
+
+elseif (Выход) then
+  :POST logout;
+  stop
+
+else (другое)
+  :hash routing;
+endif
+
+partition Плеер {
+  if (Воспроизведение?) then (да)
+    |Плеер|
+    :playTrack;
+    :lyrics LRC;
+    repeat
+      |Пользователь|
+      if (Управление?) then (pause)
+      elseif (next)
+      elseif (очередь)
+      elseif (лайк)
+      else (конец)
+        break
+      endif
+    repeat while (Есть очередь?) is (да)
+    ->нет;
+  endif
+}
+
+|Клиент app.js|
+repeat while (Сессия?) is (да)
+->нет;
+stop
+
+@enduml

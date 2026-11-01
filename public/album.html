@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#1db954">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Альбом</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="manifest" href="/muzic2/public/manifest.json">
+  <link rel="apple-touch-icon" href="/muzic2/public/assets/img/icon-192x192.png">
+  <style>
+    .album-header {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .album-cover {
+      width: 220px;
+      height: 220px;
+      border-radius: 18px;
+      object-fit: cover;
+      box-shadow: 0 8px 32px rgba(30,185,84,0.18);
+      background: #181818;
+    }
+    .album-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .album-title {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .album-artist {
+      font-size: 1.3rem;
+      color: #b3b3b3;
+      font-weight: 600;
+    }
+    .album-info {
+      font-size: 1.1rem;
+      color: #b3b3b3;
+      margin-top: 0.5rem;
+    }
+    .album-genre {
+      font-size: 1.08rem;
+      color: #1db954;
+      margin-top: 0.2rem;
+      font-weight: 600;
+    }
+    .album-desc {
+      font-size: 1.05rem;
+      color: #b3b3b3;
+      margin-top: 0.7rem;
+      max-width: 600px;
+    }
+    .album-controls {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .album-play-btn {
+      background: #1db954;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(30,185,84,0.15);
+      transition: background 0.18s, transform 0.18s;
+    }
+    .album-play-btn:hover {
+      background: #17a74a;
+      transform: scale(1.06);
+    }
+    .tracks-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .tracks-table th, .tracks-table td {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      color: #fff;
+      font-size: 1.08rem;
+    }
+    .tracks-table th {
+      color: #b3b3b3;
+      font-weight: 600;
+      font-size: 1.02rem;
+      border-bottom: 1px solid #232323;
+    }
+    .tracks-table tr {
+      transition: background 0.15s;
+      cursor: pointer;
+      position: relative;
+    }
+    .tracks-table tr:hover {
+      background: #232323;
+    }
+    .track-play-btn {
+      display: none;
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1db954;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      font-size: 1.3rem;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(30,185,84,0.10);
+      transition: background 0.18s, transform 0.18s;
+    }
+    .tracks-table tr:hover .track-play-btn {
+      display: flex;
+    }
+    .tracks-table tr:hover .track-num {
+      visibility: hidden;
+    }
+    .tracks-table td.track-num {
+      color: #b3b3b3;
+      width: 2.5rem;
+      font-size: 1.02rem;
+    }
+    .tracks-table td.track-title {
+      font-weight: 700;
+      color: #fff;
+    }
+    .tracks-table td.track-artist {
+      color: #b3b3b3;
+      font-size: 1.01rem;
+    }
+    .tracks-table td.track-duration {
+      color: #b3b3b3;
+      font-size: 1.01rem;
+      text-align: right;
+      width: 4.5rem;
+    }
+
+    /* Responsive Album Page */
+    @media (max-width: 768px) {
+      .album-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .album-cover {
+        width: 180px;
+        height: 180px;
+      }
+      .album-title {
+        font-size: 2.5rem;
+      }
+      .album-artist {
+        font-size: 1.1rem;
+      }
+      .album-info {
+        font-size: 1rem;
+      }
+      .album-desc {
+        font-size: 0.95rem;
+        max-width: 100%;
+      }
+      .album-controls {
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+      .album-play-btn {
+        width: 56px;
+        height: 56px;
+        font-size: 2rem;
+      }
+      .tracks-table th, .tracks-table td {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.95rem;
+      }
+      .tracks-table th {
+        font-size: 0.9rem;
+      }
+      .tracks-table td.track-num {
+        width: 2rem;
+        font-size: 0.9rem;
+      }
+      .tracks-table td.track-duration {
+        width: 3.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .album-header {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        gap: 1rem;
+      }
+      .album-cover {
+        width: 150px;
+        height: 150px;
+      }
+      .album-title {
+        font-size: 2rem;
+      }
+      .album-artist {
+        font-size: 1rem;
+      }
+      .album-info {
+        font-size: 0.9rem;
+      }
+      .album-desc {
+        font-size: 0.85rem;
+      }
+      .album-controls {
+        margin-bottom: 0.75rem;
+      }
+      .album-play-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.8rem;
+      }
+      .tracks-table th, .tracks-table td {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.85rem;
+      }
+      .tracks-table th {
+        font-size: 0.8rem;
+      }
+      .tracks-table td.track-num {
+        width: 1.5rem;
+        font-size: 0.8rem;
+      }
+      .tracks-table td.track-duration {
+        width: 3rem;
+        font-size: 0.8rem;
+      }
+      .track-play-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 1.1rem;
+        left: 0.8rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .album-cover {
+        width: 120px;
+        height: 120px;
+      }
+      .album-title {
+        font-size: 1.5rem;
+      }
+      .album-artist {
+        font-size: 0.9rem;
+      }
+      .tracks-table th, .tracks-table td {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.8rem;
+      }
+      .tracks-table th {
+        font-size: 0.75rem;
+      }
+      .tracks-table td.track-num {
+        width: 1.2rem;
+        font-size: 0.75rem;
+      }
+      .tracks-table td.track-duration {
+        width: 2.5rem;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+  <style>
+    .heart-btn{ background:transparent; border:none; color:#bbb; border-radius:999px; width:28px; height:28px; cursor:pointer; }
+    .heart-btn.liked{ color:#1db954; }
+  </style>
+</head>
+<body style="background: #181818; color: #fff;">
+  <div id="main-content" style="padding-bottom: 120px;">
+    <div class="album-header">
+      <img class="album-cover" id="album-cover" src="" alt="cover">
+      <div class="album-meta">
+        <div class="album-title" id="album-title">—</div>
+        <div class="album-artist" id="album-artist">—</div>
+        <div class="album-info" id="album-info">—</div>
+        <div class="album-genre" id="album-genre"></div>
+        <div class="album-desc" id="album-desc"></div>
+      </div>
+    </div>
+    <div class="album-controls">
+      <button class="album-play-btn" id="album-play-btn">▶</button>
+      <!-- Здесь можно добавить другие кнопки -->
+    </div>
+    <table class="tracks-table" id="tracks-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Название</th>
+          <th>Артист</th>
+          <th>❤</th>
+          <th>⏱</th>
+        </tr>
+      </thead>
+      <tbody id="tracks-tbody">
+      </tbody>
+    </table>
+  </div>
+  <div id="player-root"></div>
+  <script src="assets/js/player.js"></script>
+  <script>
+    // Получаем album из query
+    function getAlbumName() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('album');
+    }
+    // Формат времени
+    function formatTime(sec) {
+      sec = Math.floor(sec);
+      return `${Math.floor(sec/60)}:${('0'+(sec%60)).slice(-2)}`;
+    }
+    // Загрузка альбома
+    async function loadAlbum() {
+      const album = getAlbumName();
+      if (!album) return;
+      // Исправленный путь к API с учётом корня
+      const res = await fetch('/muzic2/src/api/album.php?album=' + encodeURIComponent(album));
+      const data = await res.json();
+      document.getElementById('album-cover').src = '/muzic2/' + (data.cover || 'tracks/covers/placeholder.jpg');
+      document.getElementById('album-title').textContent = data.title || '';
+      document.getElementById('album-artist').textContent = data.artist || '';
+      document.getElementById('album-info').textContent = `${data.year || ''} • ${data.tracks.length} треков, ${formatTime(data.total_duration || 0)}`;
+      document.getElementById('album-genre').textContent = data.genre ? `Жанр: ${data.genre}` : '';
+      document.getElementById('album-desc').textContent = data.description || '';
+      // Таблица треков
+      const tbody = document.getElementById('tracks-tbody');
+      tbody.innerHTML = '';
+      data.tracks.forEach((t, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="track-num">${i+1}</td>
+          <td class="track-title">${t.title}</td>
+          <td class="track-artist">${t.artist}</td>
+          <td><button class="heart-btn" data-track-id="${t.id||''}">❤</button></td>
+          <td class="track-duration">${t.duration ? formatTime(t.duration) : '—'}</td>
+        `;
+        // Кнопка Play
+        const trackId = t.id || 0;
+        const isPlaying = window.isTrackPlaying && window.isTrackPlaying(trackId);
+        const playBtn = document.createElement('button');
+        playBtn.className = 'track-play-btn' + (isPlaying ? ' playing' : '');
+        playBtn.innerHTML = isPlaying ? '&#10074;&#10074;' : '&#9654;';
+        playBtn.setAttribute('data-track-id', trackId);
+        playBtn.setAttribute('data-track-index', i);
+        const queueRaw = data.tracks.map(tt => ({
+          id: tt.id,
+          src: (function(){ const s = tt.file_path||''; if (/^https?:/i.test(s)) return s; const idx=s.indexOf('tracks/'); return idx!==-1?('/muzic2/'+s.slice(idx)):'/muzic2/'+s.replace(/^\/?/,''); })(),
+          title: tt.title,
+          artist: tt.artist,
+          cover: (function(){ const c = tt.cover||data.cover||'tracks/covers/placeholder.jpg'; if (/^https?:|^data:/i.test(c)) return c; const idx=c.indexOf('tracks/'); return idx!==-1?('/muzic2/'+c.slice(idx)):'/muzic2/'+c.replace(/^\/?/,''); })(),
+          duration: tt.duration||0,
+          video_url: tt.video_url || ''
+        }));
+        const queue = queueRaw.map(ti => ({ ...ti, src: encodeURI(ti.src) }));
+        playBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (isPlaying && window.pauseCurrentTrack) {
+            window.pauseCurrentTrack();
+          } else {
+            window.playTrack && window.playTrack({
+              ...queue[i],
+              queue,
+              queueStartIndex: i
+            });
+          }
+        };
+        tr.children[0].style.position = 'relative';
+        tr.children[0].appendChild(playBtn);
+        // Клик по строке — тоже play
+        tr.onclick = (e) => {
+          if (e.target !== playBtn) {
+            const queueRaw = data.tracks.map(tt => ({
+              id: tt.id,
+              src: (function(){ const s = tt.file_path||''; if (/^https?:/i.test(s)) return s; const idx=s.indexOf('tracks/'); return idx!==-1?('/muzic2/'+s.slice(idx)):'/muzic2/'+s.replace(/^\/?/,''); })(),
+              title: tt.title,
+              artist: tt.artist,
+              cover: (function(){ const c = tt.cover||data.cover||'tracks/covers/placeholder.jpg'; if (/^https?:|^data:/i.test(c)) return c; const idx=c.indexOf('tracks/'); return idx!==-1?('/muzic2/'+c.slice(idx)):'/muzic2/'+c.replace(/^\/?/,''); })(),
+              duration: tt.duration||0,
+              video_url: tt.video_url || ''
+            }));
+            const queue = queueRaw.map(ti => ({ ...ti, src: encodeURI(ti.src) }));
+            window.playTrack && window.playTrack({ ...queue[i], queue, queueStartIndex: i });
+          }
+        };
+        // Heart toggle
+        const hb = tr.querySelector('.heart-btn');
+        hb.onclick = async (e) => {
+          e.stopPropagation();
+          const id = Number(hb.getAttribute('data-track-id'));
+          if (!id) return;
+          if (hb.classList.contains('liked')) {
+            await fetch('/muzic2/src/api/windows_likes.php', { method:'DELETE', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ track_id: id })});
+            hb.classList.remove('liked');
+            try{ document.dispatchEvent(new CustomEvent('likes:updated', { detail:{ trackId: id, liked:false } })); }catch(_){ }
+          } else {
+            await fetch('/muzic2/src/api/windows_likes.php', { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ track_id: id })});
+            hb.classList.add('liked');
+            try{ document.dispatchEvent(new CustomEvent('likes:updated', { detail:{ trackId: id, liked:true } })); }catch(_){ }
+          }
+        };
+        tbody.appendChild(tr);
+      });
+      // Инициализируем состояния лайков для треков альбома
+      try {
+        const lr = await fetch('/muzic2/src/api/windows_likes.php?lite=1', { credentials:'include' });
+        const lj = await lr.json();
+        const likedIds = lj.lite && Array.isArray(lj.track_ids) ? lj.track_ids : (lj.tracks||[]).map(x=>x.id);
+        const likedSet = new Set(likedIds.map(id => Number(id)));
+        document.querySelectorAll('.heart-btn[data-track-id]')
+          .forEach(btn=>{ const id = Number(btn.getAttribute('data-track-id')); if (likedSet.has(id)) btn.classList.add('liked'); });
+      } catch(_) {}
+      // Подписка на глобальные изменения лайков
+      document.addEventListener('likes:updated', (e)=>{
+        const d = e.detail || {}; const id = d.trackId; const liked = !!d.liked;
+        if (!id) return;
+        document.querySelectorAll(`.heart-btn[data-track-id="${id}"]`).forEach(btn=>{
+          if (liked) btn.classList.add('liked'); else btn.classList.remove('liked');
+        });
+      });
+      // Очередь для плеера
+      window.albumQueue = data.tracks.map(t => ({
+        id: t.id,
+        src: (function(){ const s = t.file_path||''; if (/^https?:/i.test(s)) return s; const idx=s.indexOf('tracks/'); return idx!==-1?('/muzic2/'+s.slice(idx)):'/muzic2/'+s.replace(/^\/?/,''); })(),
+        title: t.title,
+        artist: t.artist,
+        cover: (function(){ const c = t.cover||data.cover||'tracks/covers/placeholder.jpg'; if (/^https?:|^data:/i.test(c)) return c; const idx=c.indexOf('tracks/'); return idx!==-1?('/muzic2/'+c.slice(idx)):'/muzic2/'+c.replace(/^\/?/,''); })(),
+        duration: t.duration || 0,
+        video_url: t.video_url || ''
+      }));
+      // Update play buttons when track changes
+      const updateAlbumTrackButtons = () => {
+        if (!window.isTrackPlaying) return;
+        document.querySelectorAll('.track-play-btn[data-track-id]').forEach(btn => {
+          const trackId = parseInt(btn.getAttribute('data-track-id') || '0', 10);
+          const isPlaying = window.isTrackPlaying(trackId);
+          if (isPlaying) {
+            btn.classList.add('playing');
+            btn.innerHTML = '&#10074;&#10074;';
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              if (window.pauseCurrentTrack) window.pauseCurrentTrack();
+            };
+          } else {
+            btn.classList.remove('playing');
+            btn.innerHTML = '&#9654;';
+            const trackIndex = parseInt(btn.getAttribute('data-track-index') || '0', 10);
+            const queueRaw = data.tracks.map(tt => ({
+              id: tt.id,
+              src: (function(){ const s = tt.file_path||''; if (/^https?:/i.test(s)) return s; const idx=s.indexOf('tracks/'); return idx!==-1?('/muzic2/'+s.slice(idx)):'/muzic2/'+s.replace(/^\/?/,''); })(),
+              title: tt.title,
+              artist: tt.artist,
+              cover: (function(){ const c = tt.cover||data.cover||'tracks/covers/placeholder.jpg'; if (/^https?:|^data:/i.test(c)) return c; const idx=c.indexOf('tracks/'); return idx!==-1?('/muzic2/'+c.slice(idx)):'/muzic2/'+c.replace(/^\/?/,''); })(),
+              duration: tt.duration||0,
+              video_url: tt.video_url || ''
+            }));
+            const queue = queueRaw.map(ti => ({ ...ti, src: encodeURI(ti.src) }));
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              window.playTrack && window.playTrack({
+                ...queue[trackIndex],
+                queue,
+                queueStartIndex: trackIndex
+              });
+            };
+          }
+        });
+      };
+      
+      document.addEventListener('track:play', () => setTimeout(updateAlbumTrackButtons, 100));
+      document.addEventListener('track:pause', () => setTimeout(updateAlbumTrackButtons, 100));
+      document.addEventListener('track:change', () => setTimeout(updateAlbumTrackButtons, 100));
+      
+      // Кнопка Play
+      document.getElementById('album-play-btn').onclick = () => {
+        const queue = (window.albumQueue || []).map(t => ({ ...t, src: encodeURI(t.src) }));
+        if (queue.length) {
+          window.playTrack && window.playTrack({ ...queue[0], queue, queueStartIndex: 0 });
+        }
+      };
+    }
+    loadAlbum();
+  </script>
+</body>
+</html> 

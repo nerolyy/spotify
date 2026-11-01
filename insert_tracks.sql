@@ -1,0 +1,31 @@
+INSERT INTO tracks (title, artist, album, album_type, duration, file_path, cover)
+VALUES
+('кассета 1', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/trinadcat_karat_kasseta_1.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('утонуть', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/утонуть.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('во снах', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/во снах.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('проваливай', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/проваливай.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('ты', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/ты.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('кассета 6', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/кассета 6.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('давай расскажем', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/давай расскажем.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('пока он тебя не бросит', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/пока он тебя не бросит.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('подружка', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/trinadcat_karat_kasseta_1.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('больше не буду', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/тринадцать_карат_Три_больше_не_буду.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('научился летать', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/научился_летать_тринадцать_карат.m4a', 'tracks/covers/m1000x1000.jpeg'),
+('одна', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/trinadcat_karat_kasseta_1.mp3', 'tracks/covers/m1000x1000.jpeg'),
+('жить после', 'тринадцать карат', '13 причин почему', 'album', 180, 'tracks/music/жить после - тринадцать карат.m4a', 'tracks/covers/m1000x1000.jpeg'),
+('JUMP!', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-JUMP!.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('KYLIE MINOGUE', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-KYLIE MINOGUE.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('PARIS 2008', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-PARIS 2008.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('BABY', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-BABY.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('$$$', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-$$$.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('DEAD MEN WALKING', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-DEAD MEN WALKING.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('ANGLE MAY CRY', 'Kai Angel', 'Angel May Cry', 'album', 180, 'tracks/music/Kai Angel-ANGEL MAY CRY.mp3', 'tracks/covers/Kai-Angel-ANGEL-MAY-CRY-07.jpg'),
+('john galliano', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/Kai Angel - john galliano.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('millions', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/Kai Angel - millions.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('i hate fashion shows', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'ttracks/music/Kai Angel - i hate fashion shows.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('metallica', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/Kai Angel - metallica.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('laperouse', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/Kai Angel - laperouse.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('white ferrari', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/Kai Angel - white ferrari.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png'),
+('smirnoff ice', 'Kai Angel', 'Angel May Cry 2', 'album', 180, 'tracks/music/smirnoff ice.mp3', 'tracks/covers/Снимок экрана 2025-07-14 в 07.03.03.png');
+
+

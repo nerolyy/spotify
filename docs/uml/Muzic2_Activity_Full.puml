@@ -1,0 +1,205 @@
+@startuml
+title Muzic2 - Polnaya diagramma aktivnosti
+
+skinparam activityBorderColor #333333
+skinparam activityBackgroundColor #FAFAFA
+skinparam activityFontSize 11
+skinparam partitionBackgroundColor #EEF7EE
+skinparam partitionBorderColor #1a9e4a
+
+|Polzovatel|
+start
+:Otkryt sait /muzic2/public/;
+
+|Klient app.js|
+:Redirekt HTTPS na HTTP;
+:DOM ready;
+
+partition Inicializaciya {
+  :initSession();
+  fork
+    :GET user_windows.php;
+  fork again
+    :Chtenie localStorage currentUser;
+  end fork
+  if (Avtorizovan?) then (net)
+    |Polzovatel|
+    :Ekran Vhoda;
+    |Klient app.js|
+    if (Deystvie?) then (Vhod)
+      :POST windows_auth.php login;
+    else (Registraciya)
+      :POST windows_auth.php register;
+    endif
+    if (Uspeshno?) then (net)
+      :Pokazat oshibku;
+      stop
+    else (da)
+    endif
+  else (da)
+    :Sessiya aktivna;
+  endif
+  :showAuthenticatedContent;
+  :renderAuthHeader;
+  :navigateTo home;
+}
+
+|Polzovatel|
+repeat
+:Rabota v prilozhenii;
+
+|Klient app.js|
+if (Razdel?) then (Glavnaya)
+
+  partition Glavnaya {
+    :renderHome;
+    :GET home_windows.php;
+    :Sekcii: izbrannoe, miksy, albomy, treki, artisty;
+    :Hero: Poisk, Moya muzyka, Puls;
+    :renderContinueListening;
+    |Polzovatel|
+    if (Deystvie?) then (Puls)
+      :startPulse;
+      :GET likes lite;
+      :Formirovanie ocheredi 30 trekov;
+      :setQueue i playFromQueue;
+    elseif (Kartochka treka)
+      :playTrack;
+    elseif (Kartochka alboma)
+      :renderAlbumSPA;
+    elseif (Kartochka artista)
+      :renderArtistSPA;
+    elseif (Layk treka)
+      :toggle like API;
+    elseif (Kontekstnoe menu)
+      :menyu treka;
+    endif
+  }
+
+elseif (Poisk) then
+
+  partition Poisk {
+    :renderSearch;
+    |Polzovatel|
+    :Vvod zaprosa;
+    |Klient app.js|
+    :GET search_windows.php;
+    :Rezultaty: treki, artisty, albomy;
+    |Polzovatel|
+    if (Klik?) then (Treka)
+      :playTrack;
+    elseif (Alboma)
+      :renderAlbumSPA;
+    elseif (Artista)
+      :renderArtistSPA;
+    endif
+  }
+
+elseif (Moya muzyka) then
+
+  partition Moya_muzyka {
+    :renderMyMusic;
+    fork
+      :GET playlists_windows.php;
+    fork again
+      :GET windows_likes.php;
+    end fork
+    :Pleylisty i layki;
+    |Polzovatel|
+    if (Deystvie?) then (Otkryt pleylist)
+      :openPlaylist;
+      :GET playlists.php po id;
+    elseif (Sozdat pleylist)
+      :openCreatePlaylistDialog;
+      :POST upload_cover opcionalno;
+      :POST playlists.php create;
+    elseif (Udalit pleylist)
+      if (Lyubimye treki?) then (da)
+        :Zapret udaleniya;
+      else (net)
+        :POST playlists.php delete;
+      endif
+    elseif (Layk alboma)
+      :menyu alboma;
+    endif
+  }
+
+elseif (Albom SPA) then
+
+  partition Albom {
+    :GET album_windows.php;
+    :Spisok trekov;
+    |Polzovatel|
+    if (Deystvie?) then (Play)
+      :playTrack ochered alboma;
+    elseif (Layk alboma)
+      :POST DELETE windows_likes;
+    endif
+  }
+
+elseif (Artist SPA) then
+
+  partition Artist {
+    :GET artist_windows.php;
+    :Albomy i treki;
+    |Polzovatel|
+    if (Deystvie?) then (Play)
+      :playTrack;
+    elseif (Perehod na albom)
+      :renderAlbumSPA;
+    endif
+  }
+
+elseif (Vyhod) then
+  :POST logout.php;
+  :Ochistit localStorage;
+  stop
+
+else (drugoe)
+  :hash routing;
+endif
+
+partition Pleyer {
+  if (Vosproizvedenie?) then (da)
+    |Pleyer player.js|
+    :playTrack setQueue;
+    :Zagruzka audio;
+    :GET lyrics.php LRC;
+    :Karaoke panel;
+    repeat
+      |Polzovatel|
+      if (Upravlenie?) then (play pause)
+      elseif (next prev)
+      elseif (seek)
+      elseif (Ochered)
+        :toggleQueuePanel;
+      elseif (Karaoke)
+      elseif (Layk)
+        :windows_likes POST DELETE;
+      else (konec treka)
+        break
+      endif
+    repeat while (Est ochered?) is (da)
+    ->net;
+    :Sohranit recent localStorage;
+  endif
+}
+
+partition Layki {
+  if (Tip?) then (Treka)
+    :POST DELETE track_id;
+  else (Alboma)
+    :POST DELETE album_title;
+  endif
+  :Obnovit likedSet;
+}
+
+|Klient app.js|
+repeat while (Sessiya aktivna?) is (da)
+->net;
+
+|Polzovatel|
+:Zakryt vkladku;
+stop
+
+@enduml

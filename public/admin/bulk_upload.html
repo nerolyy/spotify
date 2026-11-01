@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Массовое добавление треков</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { margin-bottom: 2rem; color: #1db954; }
+        .upload-area {
+            border: 2px dashed #333;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            background: #1a1a1a;
+            margin-bottom: 2rem;
+            transition: all 0.3s;
+        }
+        .upload-area.dragover {
+            border-color: #1db954;
+            background: #1a2a1a;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-btn {
+            background: #1db954;
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .upload-btn:hover {
+            background: #1ed760;
+        }
+        .file-list {
+            margin-top: 2rem;
+        }
+        .file-item {
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .file-name {
+            flex: 1;
+            margin-right: 1rem;
+        }
+        .file-size {
+            color: #666;
+            margin-right: 1rem;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #1db954;
+            transition: width 0.3s;
+        }
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #1a2a1a;
+            border: 1px solid #1db954;
+            display: block;
+        }
+        .status.error {
+            background: #2a1a1a;
+            border: 1px solid #ff4444;
+            display: block;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .stat-card {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1db954;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Массовое добавление треков</h1>
+        
+        <div class="upload-area" id="uploadArea">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">Перетащите MP3 файлы сюда</p>
+            <p style="color: #666; margin-bottom: 2rem;">или</p>
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                Выбрать файлы
+            </button>
+            <input type="file" id="fileInput" multiple accept="audio/mpeg,audio/mp3" onchange="handleFiles(this.files)">
+        </div>
+        
+        <div id="fileList" class="file-list"></div>
+        
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="stats" id="stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="addedCount">0</div>
+                <div class="stat-label">Добавлено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="skippedCount">0</div>
+                <div class="stat-label">Пропущено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="errorCount">0</div>
+                <div class="stat-label">Ошибок</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const status = document.getElementById('status');
+        const stats = document.getElementById('stats');
+        
+        let selectedFiles = [];
+        
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        function handleFiles(files) {
+            selectedFiles = Array.from(files).filter(f => f.type === 'audio/mpeg' || f.name.endsWith('.mp3'));
+            
+            if (selectedFiles.length === 0) {
+                alert('Выберите MP3 файлы');
+                return;
+            }
+            
+            renderFileList();
+            uploadFiles();
+        }
+        
+        function renderFileList() {
+            fileList.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-item">
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatSize(file.size)}</span>
+                </div>
+            `).join('');
+        }
+        
+        async function uploadFiles() {
+            progressBar.style.display = 'block';
+            status.style.display = 'none';
+            stats.style.display = 'none';
+            
+            const formData = new FormData();
+            selectedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+            
+            try {
+                const response = await fetch('/muzic2/src/api/bulk_upload.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showSuccess(result);
+                } else {
+                    showError(result.message || 'Ошибка загрузки');
+                }
+            } catch (error) {
+                showError('Ошибка: ' + error.message);
+            }
+        }
+        
+        function showSuccess(data) {
+            status.className = 'status success';
+            status.textContent = `✅ Успешно добавлено ${data.added || 0} треков!`;
+            status.style.display = 'block';
+            
+            document.getElementById('addedCount').textContent = data.added || 0;
+            document.getElementById('skippedCount').textContent = data.skipped || 0;
+            document.getElementById('errorCount').textContent = data.errors || 0;
+            stats.style.display = 'grid';
+            
+            progressFill.style.width = '100%';
+        }
+        
+        function showError(message) {
+            status.className = 'status error';
+            status.textContent = '❌ ' + message;
+            status.style.display = 'block';
+        }
+        
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

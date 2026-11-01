@@ -1,0 +1,1117 @@
+/* Artist Page Styles */
+.artist-page {
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(180deg, rgba(40, 40, 40, 0.8) 0%, rgba(24, 24, 24, 1) 30%);
+    min-height: 100vh;
+}
+
+/* Artist Hero Section */
+.artist-hero {
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem 2rem 1.5rem 2rem;
+    background: none;
+    gap: 2rem;
+    min-height: 340px;
+    position: relative;
+    overflow: hidden;
+}
+
+.artist-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--artist-bg, url('/muzic2/tracks/covers/m1000x1000.jpeg')) center/cover no-repeat;
+    filter: brightness(0.25) blur(5px);
+    z-index: 0;
+}
+
+.artist-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.25) 45%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 2;
+}
+
+.artist-hero-video-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.artist-hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    filter: blur(10px) brightness(0.55) saturate(1.1);
+    pointer-events: none;
+}
+
+.artist-hero-video-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 45%);
+    mix-blend-mode: screen;
+    opacity: 0.4;
+}
+
+
+.artist-avatar-container {
+    position: relative;
+    z-index: 4;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.artist-avatar-wrapper {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+}
+
+.artist-avatar-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), transparent 65%);
+    filter: blur(30px);
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.artist-avatar-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 6px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        inset 0 0 25px rgba(0, 0, 0, 0.6),
+        0 0 25px rgba(30, 215, 96, 0.2);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.artist-avatar-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 110%;
+    height: 110%;
+    object-fit: cover;
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.9;
+    filter: saturate(1.2) brightness(0.9) contrast(1.05);
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 50%;
+    clip-path: circle(50% at 50% 50%);
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.35);
+}
+
+.artist-avatar-photo {
+    position: relative;
+    width: 92%;
+    height: 92%;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 3;
+    border: 4px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+        inset 0 0 35px rgba(0, 0, 0, 0.6),
+        0 15px 35px rgba(0, 0, 0, 0.7);
+    background: #0e0e0e;
+}
+
+.artist-avatar-large {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1);
+    transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.artist-avatar-wrapper:hover .artist-avatar-large {
+    transform: scale(1.05);
+    filter: saturate(1.05) brightness(1.05);
+}
+
+.artist-avatar-wrapper:hover {
+    box-shadow: 0 16px 56px rgba(30, 215, 96, 0.3);
+    border-color: rgba(30, 215, 96, 0.4);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+}
+
+.artist-avatar-wrapper:hover .artist-avatar-video {
+    opacity: 1;
+    filter: blur(10px) brightness(0.7) saturate(1.5);
+}
+
+/* Special styling for Kai Angel portrait */
+.artist-avatar-large[src*="Снимок экрана 2025-07-19"] {
+    object-position: center 30%;
+    border-color: rgba(30, 215, 96, 0.2);
+}
+
+.artist-avatar-large[src*="Снимок экрана 2025-07-19"]:hover {
+    border-color: rgba(30, 215, 96, 0.5);
+    box-shadow: 0 12px 40px rgba(30, 215, 96, 0.2);
+}
+
+.artist-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 4;
+}
+
+.artist-verified {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1ed760;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.artist-verified i {
+    font-size: 1rem;
+}
+
+.artist-name-large {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: #fff;
+    margin: 0;
+    line-height: 0.9;
+    letter-spacing: -2px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.artist-listeners {
+    font-size: 1rem;
+    color: #b3b3b3;
+    margin: 0;
+}
+
+/* Artist Controls */
+.artist-controls {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 2rem 1rem 2rem;
+}
+
+.play-all-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #1ed760;
+    border: none;
+    color: #000;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(30, 215, 96, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.play-all-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.play-all-btn:hover {
+    transform: scale(1.04);
+    background: #1fdf64;
+    box-shadow: 0 6px 20px rgba(30, 215, 96, 0.4);
+}
+
+.play-all-btn:hover::before {
+    left: 100%;
+}
+
+.shuffle-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.shuffle-btn:hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.7rem 1.6rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.promo-btn i {
+    font-size: 0.95rem;
+}
+
+.promo-btn:hover {
+    border-color: #1ed760;
+    color: #1ed760;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(30, 215, 96, 0.25);
+}
+
+.follow-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-radius: 4px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.follow-btn:hover {
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.more-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0.5rem;
+}
+
+.more-btn:hover {
+    color: #fff;
+}
+
+/* Popular Tracks Section */
+.popular-tracks-section {
+    padding: 2rem 2rem 1rem 2rem;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.track-item-numbered {
+    animation: slideInLeft 0.4s ease-out;
+    animation-fill-mode: both;
+}
+
+.track-item-numbered:nth-child(1) { animation-delay: 0.1s; }
+.track-item-numbered:nth-child(2) { animation-delay: 0.2s; }
+.track-item-numbered:nth-child(3) { animation-delay: 0.3s; }
+.track-item-numbered:nth-child(4) { animation-delay: 0.4s; }
+.track-item-numbered:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.popular-tracks-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 1.5rem 0;
+}
+
+.tracks-list-numbered {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.track-item-numbered {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 0.25rem;
+}
+
+.track-item-numbered:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.track-number {
+    width: 20px;
+    text-align: center;
+    color: #b3b3b3;
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.track-item-numbered:hover .track-number {
+    display: none;
+}
+
+.track-play-icon {
+    display: none;
+    width: 20px;
+    text-align: center;
+    color: #fff;
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.track-item-numbered:hover .track-play-icon {
+    display: block;
+}
+
+.track-cover-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    margin-right: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.track-item-numbered:hover .track-cover-small {
+    transform: scale(1.05);
+}
+
+.track-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.track-title-primary {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.track-title-primary:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.track-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.track-explicit {
+    background: #b3b3b3;
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 4px;
+    border-radius: 2px;
+    line-height: 1;
+}
+
+.track-plays {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+}
+
+.track-duration {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+    margin-left: auto;
+    margin-right: 1rem;
+}
+
+.track-like-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    opacity: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+}
+
+.track-like-btn:hover {
+    color: #1ed760;
+    background: rgba(30, 215, 96, 0.1);
+    transform: scale(1.1);
+}
+
+.track-like-btn.liked {
+    color: #1ed760;
+}
+
+.track-like-btn.liked:hover {
+    background: rgba(30, 215, 96, 0.15);
+    transform: scale(1.15);
+}
+
+.track-more-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0.5rem;
+    opacity: 0;
+}
+
+.track-item-numbered:hover .track-more-btn {
+    opacity: 1;
+}
+
+.track-more-btn:hover {
+    color: #fff;
+}
+
+.show-more-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 1rem 0.5rem;
+    transition: color 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.show-more-btn:hover {
+    color: #fff;
+}
+
+/* Albums Section */
+.albums-section {
+    padding: 1rem 2rem 2rem 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.show-all-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.show-all-btn:hover {
+    color: #fff;
+}
+
+.albums-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
+.album-card {
+    background: #181818;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.album-card:hover {
+    background: #282828;
+    transform: translateY(-2px);
+}
+
+.album-cover {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.album-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.album-artist {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+    margin: 0 0 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.album-info {
+    font-size: 0.875rem;
+    color: #b3b3b3;
+    margin: 0;
+}
+
+.album-play-btn {
+    position: absolute;
+    right: 1rem;
+    bottom: 5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1ed760;
+    border: none;
+    color: #000;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+    opacity: 0;
+    box-shadow: 0 4px 16px rgba(30, 215, 96, 0.3);
+}
+
+.album-card:hover .album-play-btn {
+    opacity: 1;
+    transform: translateY(-4px);
+}
+
+.album-play-btn:hover {
+    transform: translateY(-4px) scale(1.04);
+}
+
+/* Кнопка лайка для альбомов */
+.album-heart-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b3b3b3;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0;
+    z-index: 2;
+}
+
+.album-card:hover .album-heart-btn {
+    opacity: 1;
+}
+
+.album-heart-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.album-heart-btn.liked {
+    background: rgba(30, 215, 96, 0.2);
+    border-color: #1ed760;
+    color: #1ed760;
+    opacity: 1;
+}
+
+.album-heart-btn.liked:hover {
+    background: rgba(30, 215, 96, 0.3);
+    transform: scale(1.15);
+}
+
+.video-card {
+    background: #101010;
+    border-radius: 14px;
+    padding: 0.75rem 0.75rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.video-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.video-thumb-preview {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.92) saturate(1.05);
+    transition: transform 0.25s ease;
+}
+
+.video-card:hover .video-thumb-preview {
+    transform: scale(1.02);
+}
+
+.video-thumb video {
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.video-play-overlay {
+    position: absolute;
+    inset: 0;
+    border: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.video-card:hover .video-play-overlay {
+    opacity: 1;
+}
+
+.video-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.video-info {
+    font-size: 0.85rem;
+    color: #b3b3b3;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .artist-hero {
+        padding: 1.5rem 1.5rem;
+        gap: 1.5rem;
+    }
+    
+    .artist-avatar-container {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .artist-avatar-wrapper {
+        width: 240px;
+        height: 240px;
+    }
+    
+    .artist-controls {
+        padding: 1.5rem 1.5rem;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .artist-hero {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem 1rem;
+        min-height: 300px;
+        gap: 1rem;
+    }
+    
+    .artist-avatar-container {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .artist-avatar-wrapper {
+        width: 200px;
+        height: 200px;
+        border-width: 4px;
+    }
+    
+    .artist-name-large {
+        font-size: clamp(2rem, 6vw, 3rem);
+    }
+    
+    .artist-controls {
+        padding: 1.5rem 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .play-all-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+    }
+    
+    .shuffle-btn,
+    .follow-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .popular-tracks-section,
+    .albums-section {
+        padding: 1rem;
+    }
+    
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1.25rem;
+    }
+    
+    .album-play-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.2rem;
+        right: 1rem;
+        bottom: 5rem;
+    }
+    
+    .album-heart-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+    
+    .track-item-numbered {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .track-cover-small {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .track-title-primary {
+        max-width: 150px;
+    }
+    
+    .track-duration {
+        font-size: 0.8rem;
+    }
+    
+    .track-number {
+        width: 16px;
+        font-size: 0.9rem;
+        margin-right: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .artist-hero {
+        padding: 1rem 0.75rem;
+        min-height: 250px;
+    }
+    
+    .artist-name-large {
+        font-size: clamp(1.8rem, 8vw, 2.5rem);
+    }
+    
+    .artist-avatar-container {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .artist-avatar-wrapper {
+        width: 180px;
+        height: 180px;
+        border-width: 4px;
+    }
+    
+    .artist-controls {
+        padding: 1rem 0.75rem;
+        gap: 0.75rem;
+    }
+    
+    .play-all-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+    
+    .shuffle-btn,
+    .follow-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .more-btn {
+        font-size: 1.3rem;
+    }
+    
+    .popular-tracks-section,
+    .albums-section {
+        padding: 0.75rem;
+    }
+    
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+    
+    .album-play-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+        right: 0.75rem;
+        bottom: 4.5rem;
+    }
+    
+    .album-heart-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 0.7rem;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    .track-item-numbered {
+        padding: 0.6rem 0.4rem;
+    }
+    
+    .track-cover-small {
+        width: 28px;
+        height: 28px;
+        margin-right: 0.75rem;
+    }
+    
+    .track-title-primary {
+        max-width: 120px;
+        font-size: 0.9rem;
+    }
+    
+    .track-duration {
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
+    }
+    
+    .track-number {
+        width: 14px;
+        font-size: 0.8rem;
+        margin-right: 0.5rem;
+    }
+    
+    .track-like-btn,
+    .track-more-btn {
+        font-size: 0.9rem;
+        padding: 0.4rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .artist-hero {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .artist-avatar-container {
+        width: 160px;
+        height: 160px;
+    }
+    
+    .artist-avatar-wrapper {
+        width: 160px;
+        height: 160px;
+        border-width: 3px;
+    }
+    
+    .artist-name-large {
+        font-size: clamp(1.5rem, 10vw, 2rem);
+    }
+    
+    .artist-controls {
+        padding: 0.75rem 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .play-all-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    
+    .shuffle-btn,
+    .follow-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    .popular-tracks-section,
+    .albums-section {
+        padding: 0.5rem;
+    }
+    
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .album-play-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+        right: 0.5rem;
+        bottom: 4rem;
+    }
+    
+    .album-heart-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    
+    .track-item-numbered {
+        padding: 0.5rem 0.3rem;
+    }
+    
+    .track-cover-small {
+        width: 24px;
+        height: 24px;
+        margin-right: 0.5rem;
+    }
+    
+    .track-title-primary {
+        max-width: 100px;
+        font-size: 0.85rem;
+    }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "muzic2-app",
+  "version": "1.0.0",
+  "description": "Muzic2 Desktop and Mobile App",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder --mac --win",
+    "build:ios": "echo 'iOS build requires Xcode. See ios/README.md'",
+    "copy-content": "node scripts/copy-content.js",
+    "export-data": "node scripts/export-all-data.js",
+    "prepare-app": "node scripts/prepare-standalone.js",
+    "prepare": "npm run copy-content"
+  },
+  "build": {
+    "appId": "com.muzic2.app",
+    "productName": "Muzic2",
+    "mac": {
+      "category": "public.app-category.music",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis", "portable"]
+    },
+    "files": [
+      "electron/**/*",
+      "content/**/*",
+      "assets/**/*",
+      "!**/node_modules/**/*",
+      "!content/**/*.php",
+      "!content/admin/**",
+      "!content/**/*.log"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  }
+}
+

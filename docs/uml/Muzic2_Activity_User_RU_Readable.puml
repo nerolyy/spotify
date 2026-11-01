@@ -1,0 +1,178 @@
+@startuml
+' Versiya s krupnym shriftom dlya Word / pechati
+scale max 1100 width
+skinparam defaultFontSize 14
+skinparam activityFontSize 14
+skinparam activityFontStyle bold
+skinparam titleFontSize 18
+skinparam titleFontStyle bold
+skinparam partitionFontSize 13
+skinparam shadowing false
+skinparam activityBorderColor #222222
+skinparam activityBackgroundColor #FFFFFF
+
+title Muzic2\nДействия пользователя и администратора
+
+start
+:Открыть Muzic2;
+
+if (Кто работает?) then (Пользователь)
+
+  partition "1. ВХОД" {
+    if (Вошли?) then (нет)
+      :Логин и пароль;
+      :Кнопка Войти;
+      if (Нет аккаунта?) then (да)
+        :Регистрация;
+      endif
+      if (Ошибка?) then (да)
+        :Сообщение об ошибке;
+        stop
+      endif
+    endif
+    :Меню: Главная, Поиск,\nМоя музыка;
+  }
+
+  repeat
+    :Выбрать раздел;
+
+    if (Раздел?) then (Главная)
+      partition "2. ГЛАВНАЯ" {
+        :Подборки и артисты;
+        if (Действие?) then (Пульс)
+          :Пульс;
+        elseif (Продолжить)
+          :Недавние треки;
+        elseif (Лайк)
+          :В любимые;
+        elseif (Карточка)
+          :Трек, альбом, артист;
+        endif
+      }
+    elseif (Поиск) then
+      partition "3. ПОИСК" {
+        :Запрос;
+        :Результаты;
+        :Выбор;
+      }
+    elseif (Моя музыка) then
+      partition "4. МОЯ МУЗЫКА" {
+        :Любимые треки;
+        :Любимые альбомы;
+        :Плейлисты;
+        if (Действие?) then (Создать)
+          :Название, треки, обложка;
+          :Сохранить;
+        elseif (Открыть)
+          :Список треков;
+        elseif (Удалить)
+          if (Любимые треки?) then (да)
+            :Нельзя удалить;
+          else (нет)
+            :Удалить;
+          endif
+        elseif (Лайк альбома)
+          :В любимые;
+        endif
+      }
+    elseif (Альбом) then
+      partition "5. АЛЬБОМ" {
+        :Список треков;
+        :Слушать;
+        :В любимые;
+      }
+    elseif (Артист) then
+      partition "6. АРТИСТ" {
+        :Дискография;
+        :На альбом;
+        :Слушать;
+      }
+    elseif (Меню) then
+      partition "7. МЕНЮ ТРЕКА" {
+        if (Пункт?) then (Лайк)
+          :В любимые;
+        elseif (Плейлист)
+          :В плейлист;
+        elseif (Играть)
+          :Воспроизвести;
+        endif
+      }
+    elseif (Выйти) then
+      :Выход;
+      stop
+    endif
+
+    partition "8. ПЛЕЕР" {
+      if (Управление?) then (Пауза)
+        :Пауза;
+      elseif (Далее)
+        :Следующий;
+      elseif (Назад)
+        :Предыдущий;
+      elseif (Перемотка)
+        :Перемотка;
+      elseif (Очередь)
+        :Очередь;
+      elseif (Текст)
+        :Караоке;
+      elseif (Лайк)
+        :Сердечко;
+      endif
+    }
+
+  repeat while (В сервисе?) is (да)
+  ->нет;
+  stop
+
+else (Администратор)
+
+  partition "9. АДМИН-ПАНЕЛЬ" {
+    :Открыть admin;
+    :Вход администратора;
+    repeat
+      if (Вкладка?) then (Артисты)
+        partition "АРТИСТЫ" {
+          :Список и поиск;
+          if (Действие?) then (Добавить)
+            :Новый артист;
+          elseif (Изменить)
+            :Правка;
+          elseif (Удалить)
+            :Удаление;
+          endif
+        }
+      elseif (Альбомы) then
+        partition "АЛЬБОМЫ" {
+          :Список и поиск;
+          if (Действие?) then (Добавить)
+            :Новый альбом;
+          elseif (Изменить)
+            :Правка;
+          elseif (Удалить)
+            :Удаление;
+          endif
+        }
+      else (Треки)
+        partition "ТРЕКИ" {
+          :Список и поиск;
+          if (Действие?) then (Добавить)
+            :Новый трек;
+          elseif (Изменить)
+            :Правка;
+          elseif (Удалить)
+            :Удаление;
+          endif
+        }
+      endif
+      if (Обложка?) then (да)
+        :Загрузить обложку;
+      endif
+    repeat while (В панели?) is (да)
+    ->нет;
+    :Закрыть admin;
+    stop
+  }
+
+endif
+
+@enduml

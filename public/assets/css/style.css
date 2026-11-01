@@ -1,0 +1,2449 @@
+body {
+    margin: 0;
+    font-family: 'Inter', Arial, sans-serif;
+    background: #181818;
+    color: #fff;
+    min-height: 100vh;
+}
+#app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+#main-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: #121212;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #1db954;
+}
+#main-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+#main-nav button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+#main-nav button:hover, #main-nav button.active {
+    background: #282828;
+    color: #1db954;
+}
+#user-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+#user-panel button {
+    background: #1db954;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+#user-panel button:hover {
+    background: #17a74a;
+}
+#main-content {
+    flex: 1 1 auto;
+    padding: 2.5vw 2vw 2vw 2vw;
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Mobile-first responsive header */
+@media (max-width: 768px) {
+    #main-header {
+        padding: 0.5rem 0.75rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .logo {
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+    }
+    #main-nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+    #main-nav button {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+        margin: 0 0.25rem;
+    }
+    #user-panel {
+        order: 2;
+    }
+    #user-panel button {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #main-header {
+        padding: 0.4rem 0.5rem;
+    }
+    .logo {
+        font-size: 1.1rem;
+    }
+    #main-nav button {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+    #user-panel button {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+    }
+}
+#player-root {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #282828;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+    z-index: 20;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#modal-root {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.55);
+    transition: opacity 0.2s;
+}
+.modal {
+    background: #232323;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    padding: 2rem 2.2rem 1.5rem 2.2rem;
+    min-width: 320px;
+    max-width: 95vw;
+    color: #fff;
+    position: relative;
+    animation: modalIn 0.22s cubic-bezier(.4,1.6,.6,1) both;
+}
+@keyframes modalIn {
+    from { transform: translateY(40px) scale(0.97); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+}
+.modal h2 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #1db954;
+}
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.modal label {
+    font-size: 1rem;
+    color: #b3b3b3;
+    margin-bottom: 0.2rem;
+}
+.modal input[type="text"],
+.modal input[type="email"],
+.modal input[type="password"] {
+    background: #181818;
+    border: 1.5px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1.05rem;
+    padding: 0.6rem 1rem;
+    outline: none;
+    transition: border 0.18s;
+}
+.modal input:focus {
+    border-color: #1db954;
+}
+.modal .modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    justify-content: flex-end;
+}
+.modal button[type="submit"] {
+    background: #1db954;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-size: 1.08rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+.modal button[type="submit"]:hover {
+    background: #17a74a;
+}
+.modal .close-modal {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.18s;
+}
+.modal .close-modal:hover {
+    color: #fff;
+}
+.modal .error {
+    color: #ff4d4f;
+    font-size: 0.98rem;
+    margin-top: -0.7rem;
+    margin-bottom: 0.5rem;
+    min-height: 1.2em;
+}
+@media (max-width: 500px) {
+    .modal {
+        padding: 1.2rem 0.7rem 1rem 0.7rem;
+        min-width: 0;
+    }
+}
+
+
+#player {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0.5rem 1.5rem 0.3rem 1.5rem;
+    background: rgba(24,24,24,0.98);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -4px 24px 0 rgba(0,0,0,0.25);
+    gap: 1.5rem;
+    position: relative;
+    min-height: 90px;
+}
+.player-left {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 1rem;
+    flex: 1 1 0;
+}
+.cover {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    background: #222;
+}
+.track-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+#track-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#track-artist {
+    font-size: 0.98rem;
+    color: #b3b3b3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.track-status {
+    margin-left: 0.7rem;
+    color: #1db954;
+    font-size: 1.3rem;
+}
+.player-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 2 2 0;
+    min-width: 0;
+}
+.player-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+.player-controls button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+}
+.player-controls button#play-btn {
+    background: #1db954;
+    color: #fff;
+    font-size: 2rem;
+    width: 54px;
+    height: 54px;
+    margin: 0 0.5rem;
+    box-shadow: 0 4px 16px rgba(30,185,84,0.15);
+}
+.player-controls button#play-btn:active {
+    background: #17a74a;
+}
+.player-controls button:active, .player-controls button.active {
+    background: #232323;
+    color: #1db954;
+}
+.player-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-width: 0;
+}
+.player-progress #seek-bar {
+    flex: 1 1 200px;
+    accent-color: #1db954;
+    height: 4px;
+    border-radius: 2px;
+    background: #333;
+}
+.player-progress #current-time, .player-progress #duration {
+    font-size: 0.95rem;
+    color: #b3b3b3;
+    min-width: 44px;
+    text-align: center;
+}
+.player-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 0;
+    justify-content: flex-end;
+}
+.player-right button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+}
+.player-right button:active, .player-right button.active {
+    background: #232323;
+    color: #1db954;
+}
+.volume-bar {
+    width: 80px;
+    accent-color: #1db954;
+    margin: 0 0.3rem;
+}
+@media (max-width: 900px) {
+    #player {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+        padding: 0.5rem 0.5rem 0.3rem 0.5rem;
+        min-height: 120px;
+    }
+    .player-center {
+        order: 2;
+    }
+    .player-left, .player-right {
+        justify-content: center;
+    }
+    .player-right {
+        margin-top: 0.3rem;
+    }
+}
+@media (max-width: 600px) {
+    #player {
+        min-height: 140px;
+        padding: 0.3rem 0.2rem 0.2rem 0.2rem;
+        gap: 0.3rem;
+    }
+    .cover {
+        width: 44px;
+        height: 44px;
+    }
+    .player-right .volume-bar {
+        width: 50px;
+    }
+}
+
+.tracks-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+    justify-content: flex-start;
+}
+.track-card {
+    display: flex;
+    align-items: center;
+    background: #232323;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    padding: 0.7rem 1.2rem 0.7rem 0.7rem;
+    min-width: 260px;
+    max-width: 340px;
+    width: 100%;
+    gap: 1rem;
+    transition: box-shadow 0.18s, background 0.18s;
+}
+.track-card:hover {
+    background: #282828;
+    box-shadow: 0 4px 24px rgba(30,185,84,0.10);
+}
+.track-cover {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #181818;
+}
+.track-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.track-title {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.track-artist {
+    font-size: 0.98rem;
+    color: #b3b3b3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.track-artist .artist-link { color: inherit; cursor: pointer; text-decoration: none; }
+.track-artist .artist-link:hover { text-decoration: underline; }
+.track-play-btn {
+    background: #1db954 !important;
+    color: #000 !important;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.18s;
+    box-shadow: 0 2px 8px rgba(30,185,84,0.10);
+}
+.track-play-btn:hover {
+    background: #17a74a;
+}
+@media (max-width: 700px) {
+    .tracks-list {
+        flex-direction: column;
+        gap: 0.7rem;
+    }
+    .track-card {
+        min-width: 0;
+        max-width: 100%;
+        padding: 0.7rem 0.7rem 0.7rem 0.7rem;
+    }
+}
+
+.welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+    gap: 2.5rem;
+}
+.welcome-logo {
+    font-size: 2.7rem;
+    font-weight: 900;
+    color: #1db954;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+.welcome-slogan {
+    font-size: 1.3rem;
+    color: #b3b3b3;
+    margin-bottom: 1.5rem;
+}
+.welcome-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+.welcome-btn {
+    background: #1db954;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 0.9rem 2.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(30,185,84,0.10);
+    transition: background 0.18s, transform 0.18s;
+}
+.welcome-btn:hover {
+    background: #17a74a;
+    transform: translateY(-2px) scale(1.04);
+}
+@media (max-width: 600px) {
+    .welcome-logo {
+        font-size: 2rem;
+    }
+    .welcome-btn {
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+    }
+    .welcome-actions {
+        gap: 0.7rem;
+    }
+}
+
+.main-filters {
+    display: flex;
+    gap: 1rem;
+    margin: 2.2rem 0 1.2rem 0;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.filter-btn {
+    background: #232323;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    font-size: 1.05rem;
+    padding: 0.5rem 1.3rem;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    white-space: nowrap;
+}
+.filter-btn.active, .filter-btn:hover {
+    background: #fff;
+    color: #181818;
+    font-weight: 700;
+}
+
+/* Responsive filters */
+@media (max-width: 768px) {
+    .main-filters {
+        margin: 1.5rem 0 1rem 0;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+    .filter-btn {
+        font-size: 0.95rem;
+        padding: 0.4rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-filters {
+        margin: 1rem 0 0.75rem 0;
+        gap: 0.5rem;
+    }
+    .filter-btn {
+        font-size: 0.9rem;
+        padding: 0.35rem 0.8rem;
+    }
+}
+
+.main-section {
+    margin-bottom: 3vw;
+    padding-bottom: 1vw;
+}
+
+/* Responsive main content */
+@media (max-width: 768px) {
+    #main-content {
+        padding: 1.5rem 1rem 1rem 1rem;
+    }
+    .main-section {
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #main-content {
+        padding: 1rem 0.75rem 0.75rem 0.75rem;
+    }
+    .main-section {
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.25rem;
+    }
+}
+
+.card-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.2vw;
+    width: 100%;
+    overflow: visible;
+    padding-bottom: 0.5vw;
+    scrollbar-width: thin;
+    scrollbar-color: #232323 #181818;
+}
+@media (max-width: 1024px) {
+    .card-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 768px) {
+    .card-row {
+        grid-template-columns: 1fr;
+    }
+}
+.card-row::-webkit-scrollbar {
+    height: 10px;
+}
+.card-row::-webkit-scrollbar-thumb {
+    background: #232323;
+    border-radius: 8px;
+}
+.card-row::-webkit-scrollbar-track {
+    background: #181818;
+}
+
+.card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #232323;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(30,185,84,0.10);
+    padding: 0.6vw 1.2vw 0.6vw 0.6vw;
+    width: 100%;
+    min-height: 78px;
+    height: auto;
+    transition: box-shadow 0.22s, background 0.22s, transform 0.22s;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+    box-sizing: border-box;
+}
+.card:hover {
+    background: #282828;
+    box-shadow: 0 8px 32px rgba(30,185,84,0.18);
+    transform: translateY(-4px) scale(1.03);
+}
+.card-cover {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #181818;
+    margin-right: 1.2vw;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+.card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+.card-title {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.2vw;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+.exp-badge { display:inline-block; width:16px; height:16px; line-height:16px; text-align:center; margin:0 6px 0 0; border:0; border-radius:3px; font-size:10px; font-weight:800; color:#2b2b2b; background:#cfcfcf; vertical-align:middle }
+.card-artist {
+    font-size: 1.02rem;
+    color: #b3b3b3;
+    margin-bottom: 0.2vw;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+.card-artist .artist-link { color: inherit; cursor: pointer; text-decoration: none; }
+.card-artist .artist-link:hover { text-decoration: underline; }
+.card-type {
+    font-size: 0.95rem;
+    color: #1db954;
+    text-align: left;
+    margin-bottom: 0.2vw;
+}
+
+/* Заголовки секций */
+.main-section h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.2vw;
+    color: #fff;
+    letter-spacing: -1px;
+    margin-top: 2vw;
+}
+
+/* Responsive section headers */
+@media (max-width: 768px) {
+    .main-section h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        margin-top: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-section h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        margin-top: 1rem;
+    }
+}
+
+/* Placeholder для обложки */
+.card-cover[src=""], .card-cover:not([src]) {
+    background: linear-gradient(135deg, #1db954 0%, #232323 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: bold;
+}
+
+@media (max-width: 900px) {
+    /* Миксы и треки - 2 в ряд */
+    #mixes-row.card-row,
+    #tracks-row.card-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    .card-row {
+        gap: 1vw;
+    }
+    .card {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+        height: 60px;
+        padding: 0.8vw 1vw 0.8vw 0.8vw;
+        flex: 0 0 auto;
+        align-items: center;
+    }
+    .card-cover {
+        width: 44px;
+        height: 44px;
+        margin-right: 0.8vw;
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
+    .card-title {
+        font-size: 0.95rem;
+    }
+    .card-artist {
+        font-size: 0.85rem;
+    }
+    .main-section h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.7vw;
+    }
+}
+@media (max-width: 600px) {
+    /* Миксы и треки - 2 в ряд */
+    #mixes-row.card-row,
+    #tracks-row.card-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    .card-row {
+        gap: 0.5vw;
+    }
+    .card {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+        height: 48px;
+        padding: 0.6vw 0.8vw 0.6vw 0.6vw;
+        flex: 0 0 auto;
+        align-items: center;
+    }
+    .card-cover {
+        width: 32px;
+        height: 32px;
+        margin-right: 0.6vw;
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
+    .card-title {
+        font-size: 0.8rem;
+    }
+    .card-artist {
+        font-size: 0.7rem;
+    }
+    .main-section h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5vw;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Миксы и треки - 2 в ряд */
+    #mixes-row.card-row,
+    #tracks-row.card-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    .card {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+        height: 44px;
+        padding: 0.5vw 0.6vw 0.5vw 0.5vw;
+    }
+    .card-cover {
+        width: 28px;
+        height: 28px;
+        margin-right: 0.5vw;
+    }
+    .card-title {
+        font-size: 0.75rem;
+    }
+    .card-artist {
+        font-size: 0.65rem;
+    }
+}
+
+/* Квадратные плитки (альбомы, подборки, новинки) */
+.tile-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2vw;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5vw;
+    scrollbar-width: thin;
+    scrollbar-color: #232323 #181818;
+}
+.tile-row::-webkit-scrollbar {
+    height: 10px;
+}
+.tile-row::-webkit-scrollbar-thumb {
+    background: #232323;
+    border-radius: 8px;
+}
+.tile-row::-webkit-scrollbar-track {
+    background: #181818;
+}
+
+.tile {
+    background: #232323;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(30,185,84,0.10);
+    min-width: 200px;
+    max-width: 220px;
+    width: 200px;
+    height: auto;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: box-shadow 0.22s, background 0.22s, transform 0.22s;
+    cursor: pointer;
+    position: relative !important;
+    overflow: visible !important;
+    flex: 0 0 200px;
+    margin-bottom: 0.5vw;
+    padding-bottom: 4.5em;
+}
+.tile:hover {
+    background: #282828;
+    box-shadow: 0 8px 32px rgba(30,185,84,0.18);
+    transform: translateY(-4px) scale(1.04);
+}
+.tile-cover {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 14px 14px 14px 14px;
+    object-fit: cover;
+    background: #181818;
+    margin-bottom: 1vw;
+}
+.artist-avatar-circle {
+    border-radius: 50% !important;
+    width: 100% !important;
+    aspect-ratio: 1/1 !important;
+    object-fit: cover !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    flex-shrink: 0;
+    position: relative;
+}
+.tile-title {
+    display: block;
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0.7vw 0 0.2vw 0.7vw;
+    text-align: left;
+    line-height: 1.25;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+.tile-desc {
+    display: block;
+    font-size: 0.98rem;
+    color: #b3b3b3;
+    margin: 0 0 0.7vw 0.7vw;
+    text-align: left;
+    line-height: 1.25;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+/* Кнопка play поверх плитки */
+.tile-play {
+    position: absolute;
+    right: 1.2vw;
+    bottom: 2vw;
+    width: 38px;
+    height: 38px;
+    background: #1db954 !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000 !important;
+    font-size: 1.6rem;
+    opacity: 0;
+    transition: opacity 0.18s, transform 0.18s;
+    box-shadow: 0 2px 8px rgba(30,185,84,0.10);
+    z-index: 2;
+    cursor: pointer;
+    border: none;
+}
+.tile:hover .tile-play {
+    opacity: 1;
+    transform: scale(1.08);
+}
+.tile-play.playing {
+    background: #1db954 !important;
+    color: #000 !important;
+}
+
+/* Артисты — круглый аватар + имя */
+.artist-row {
+    display: flex;
+    flex-direction: row;
+    gap: 2vw;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5vw;
+    scrollbar-width: thin;
+    scrollbar-color: #232323 #181818;
+}
+.artist-row::-webkit-scrollbar {
+    height: 10px;
+}
+.artist-row::-webkit-scrollbar-thumb {
+    background: #232323;
+    border-radius: 8px;
+}
+.artist-row::-webkit-scrollbar-track {
+    background: #181818;
+}
+
+.artist-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    max-width: 140px;
+    width: 120px;
+    margin-bottom: 0.5vw;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+.artist-tile:hover {
+    transform: scale(1.07);
+    box-shadow: 0 4px 24px rgba(30,185,84,0.10);
+}
+.artist-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #181818;
+    margin-bottom: 0.7vw;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+.artist-name {
+    font-size: 1.02rem;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.artist-name .artist-link { color: inherit; cursor: pointer; text-decoration: none; }
+.artist-name .artist-link:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+    /* Миксы и треки - 2 в ряд */
+    #mixes-row.tile-row,
+    #tracks-row.tile-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    /* Альбомы - 3 в ряд */
+    #albums-row.tile-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.5vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    .tile {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+        min-height: 180px;
+    }
+    .tile-cover {
+        width: 100%;
+        aspect-ratio: 1/1;
+    }
+    .tile-title {
+        font-size: 0.95rem;
+        margin: 0.5vw 0 0.1vw 0.5vw;
+    }
+    .tile-desc {
+        font-size: 0.85rem;
+        margin: 0 0 0.5vw 0.5vw;
+    }
+    .tile-play {
+        width: 32px;
+        height: 32px;
+        right: 0.8vw;
+        bottom: 1.5vw;
+        font-size: 1rem;
+    }
+    .artist-tile {
+        min-width: 120px;
+        max-width: 160px;
+        width: 120px;
+        height: 160px;
+    }
+    .artist-avatar {
+        width: 80px;
+        height: 80px;
+    }
+}
+@media (max-width: 600px) {
+    /* Миксы и треки - 2 в ряд */
+    #mixes-row.tile-row,
+    #tracks-row.tile-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    /* Альбомы - 3 в ряд */
+    #albums-row.tile-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1vw;
+        overflow-x: visible;
+        padding-bottom: 0;
+    }
+    
+    .tile {
+        min-width: auto;
+        max-width: none;
+        width: 100%;
+        min-height: 140px;
+    }
+    .tile-cover {
+        width: 100%;
+        aspect-ratio: 1/1;
+    }
+    .tile-title {
+        font-size: 0.8rem;
+        margin: 0.4vw 0 0.1vw 0.4vw;
+    }
+    .tile-desc {
+        font-size: 0.7rem;
+        margin: 0 0 0.4vw 0.4vw;
+    }
+    .tile-play {
+        width: 28px;
+        height: 28px;
+        right: 0.6vw;
+        bottom: 1.2vw;
+        font-size: 0.9rem;
+    }
+    .artist-tile {
+        min-width: 80px;
+        max-width: 100px;
+        width: 80px;
+        height: 100px;
+    }
+    .artist-avatar {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+/* Desktop styles - exactly like the screenshots */
+
+/* Section headers */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 4px;
+}
+
+.section-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.see-all-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.see-all-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+}
+
+/* Tracks - 2 columns grid with horizontal cards like screenshot */
+#tracks-row.card-row,
+#favorites-row.card-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+}
+
+#tracks-row .card,
+#favorites-row .card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    min-width: auto !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 8px !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+    transition: background-color 0.2s !important;
+    box-shadow: none !important;
+    transform: none !important;
+    overflow: visible !important;
+}
+
+#tracks-row .card:hover,
+#favorites-row .card:hover {
+    background: #222 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#tracks-row .card-cover,
+#favorites-row .card-cover {
+    width: 56px !important;
+    height: 56px !important;
+    margin-right: 16px !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+    object-fit: cover !important;
+    box-shadow: none !important;
+}
+
+#tracks-row .card-info,
+#favorites-row .card-info {
+    flex: 1 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#tracks-row .card-title,
+#favorites-row .card-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    margin: 0 0 4px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+#tracks-row .card-artist,
+#favorites-row .card-artist {
+    font-size: 0.9rem !important;
+    color: #b3b3b3 !important;
+    margin: 0 0 4px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+#tracks-row .card-type,
+#favorites-row .card-type {
+    font-size: 0.8rem !important;
+    color: #1db954 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+/* Heart and kebab buttons for tracks - right side - идентично странице артиста */
+#tracks-row .heart-btn,
+#favorites-row .heart-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    opacity: 1 !important;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    margin-left: 12px;
+    flex-shrink: 0;
+    z-index: 10;
+    visibility: visible !important;
+}
+
+#tracks-row .heart-btn:hover,
+#favorites-row .heart-btn:hover {
+    color: #1ed760;
+    background: rgba(30, 215, 96, 0.1);
+    transform: scale(1.1);
+}
+
+#tracks-row .heart-btn.liked,
+#favorites-row .heart-btn.liked {
+    color: #1ed760;
+}
+
+#tracks-row .heart-btn.liked:hover,
+#favorites-row .heart-btn.liked:hover {
+    background: rgba(30, 215, 96, 0.15);
+    transform: scale(1.15);
+}
+
+#tracks-row .kebab,
+#favorites-row .kebab,
+#tracks-row .card .kebab,
+#favorites-row .card .kebab {
+    background: none !important;
+    border: none !important;
+    color: #b3b3b3 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: color 0.2s !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-left: 8px !important;
+    flex-shrink: 0 !important;
+    z-index: 10 !important;
+    visibility: visible !important;
+}
+
+#tracks-row .kebab:hover,
+#favorites-row .kebab:hover,
+#tracks-row .card .kebab:hover,
+#favorites-row .card .kebab:hover {
+    color: #fff !important;
+}
+
+/* Albums - grid layout like third screenshot */
+#albums-row.card-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+}
+
+#albums-row .card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    min-width: auto !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    margin-bottom: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#albums-row .card:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#albums-row .card-cover {
+    width: 100% !important;
+    aspect-ratio: 1/1 !important;
+    margin-right: 0 !important;
+    margin-bottom: 12px !important;
+    border-radius: 8px !important;
+    object-fit: cover !important;
+    box-shadow: none !important;
+}
+
+#albums-row .card-info {
+    padding: 0 !important;
+    width: 100% !important;
+    overflow: visible !important;
+}
+
+#albums-row .card-title {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    margin: 0 0 6px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+}
+
+#albums-row .card-artist {
+    font-size: 0.85rem !important;
+    color: #b3b3b3 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+}
+
+#albums-row .tile .album-heart-btn,
+#albums-row .tile .heart-btn,
+#albums-row .album-heart-btn,
+#albums-row .heart-btn {
+    position: absolute !important;
+    top: 0.75rem !important;
+    right: 0.75rem !important;
+    background: none !important;
+    border: none !important;
+    color: #b3b3b3 !important;
+    font-size: 1.1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    z-index: 10 !important;
+    margin: 0 !important;
+}
+
+#albums-row .album-heart-btn:hover,
+#albums-row .heart-btn:hover {
+    color: #1ed760;
+    background: rgba(30, 215, 96, 0.1);
+    transform: scale(1.1);
+}
+
+#albums-row .album-heart-btn.liked,
+#albums-row .heart-btn.liked {
+    color: #1ed760;
+}
+
+#albums-row .album-heart-btn.liked:hover,
+#albums-row .heart-btn.liked:hover {
+    background: rgba(30, 215, 96, 0.15);
+    transform: scale(1.15);
+}
+
+#albums-row .tile .album-more-btn,
+#albums-row .album-more-btn {
+    position: absolute !important;
+    top: 0.75rem !important;
+    right: calc(0.75rem + 40px) !important;
+    background: none !important;
+    border: none !important;
+    color: #b3b3b3 !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: color 0.2s !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10 !important;
+    margin: 0 !important;
+}
+
+#albums-row .album-more-btn:hover {
+    color: #fff;
+}
+
+/* Mixes - 2 columns grid with horizontal cards like tracks */
+#mixes-row.card-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    overflow-x: visible !important;
+    padding-bottom: 0 !important;
+}
+
+#mixes-row .card {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+    min-width: auto !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: auto !important;
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a !important;
+    border-radius: 8px !important;
+    margin-bottom: 0 !important;
+    position: relative !important;
+    transition: background-color 0.2s !important;
+    box-shadow: none !important;
+    transform: none !important;
+    overflow: visible !important;
+}
+
+#mixes-row .card:hover {
+    background: #222 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#mixes-row .card-cover {
+    width: 56px !important;
+    height: 56px !important;
+    margin-right: 16px !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+    object-fit: cover !important;
+    box-shadow: none !important;
+}
+
+#mixes-row .card-info {
+    flex: 1 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+#mixes-row .card-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    margin: 0 0 4px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+#mixes-row .card-artist {
+    font-size: 0.9rem !important;
+    color: #b3b3b3 !important;
+    margin: 0 0 4px 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.2 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+#mixes-row .card-type {
+    font-size: 0.8rem !important;
+    color: #1db954 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    display: block !important;
+}
+
+#mixes-row .heart-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.5rem;
+    opacity: 1 !important;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    margin-left: 12px;
+    flex-shrink: 0;
+    z-index: 10;
+    visibility: visible !important;
+}
+
+#mixes-row .heart-btn:hover {
+    color: #1ed760;
+    background: rgba(30, 215, 96, 0.1);
+    transform: scale(1.1);
+}
+
+#mixes-row .heart-btn.liked {
+    color: #1ed760;
+}
+
+#mixes-row .heart-btn.liked:hover {
+    background: rgba(30, 215, 96, 0.15);
+    transform: scale(1.15);
+}
+
+#mixes-row .kebab {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0.5rem;
+    opacity: 1 !important;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    flex-shrink: 0;
+    z-index: 10;
+    visibility: visible !important;
+}
+
+#mixes-row .kebab:hover {
+    color: #fff;
+}
+
+/* Artists - horizontal scroll with large avatars like screenshot */
+.artist-row {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 8px !important;
+    align-items: flex-start !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.artist-row::-webkit-scrollbar {
+    display: none !important;
+}
+
+.artist-tile {
+    min-width: 100px !important;
+    max-width: 100px !important;
+    width: 100px !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transition: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    flex-shrink: 0 !important;
+}
+
+.artist-tile:hover {
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.artist-avatar {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 50% !important;
+    margin-bottom: 8px !important;
+    object-fit: cover !important;
+    box-shadow: none !important;
+}
+
+.artist-name {
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    color: #fff !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+}
+
+/* Mobile overrides - only for mobile screens */
+@media (max-width: 900px) {
+    /* Override desktop styles for mobile */
+    .card-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        overflow-x: visible !important;
+        padding-bottom: 0 !important;
+    }
+    
+    .card {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 12px 4px !important;
+        min-width: auto !important;
+        max-width: none !important;
+        width: 100% !important;
+        height: auto !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin-bottom: 0 !important;
+        position: relative !important;
+        transition: background-color 0.2s !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    .card:hover {
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    .card-cover {
+        width: 56px !important;
+        height: 56px !important;
+        margin-right: 12px !important;
+        margin-bottom: 0 !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
+        object-fit: cover !important;
+        box-shadow: none !important;
+    }
+    
+    .card-info {
+        flex: 1 !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    .card-title {
+        font-size: 1.35rem !important;
+        font-weight: 800 !important;
+        color: #fff !important;
+        margin: 0 0 2px 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+    
+    .card-artist {
+        font-size: 1.05rem !important;
+        color: #9ea0a3 !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+    
+    .heart-btn {
+        position: static !important;
+        width: 32px !important;
+        height: 32px !important;
+        margin-left: 8px !important;
+        background: none !important;
+        border: none !important;
+        border-radius: 50% !important;
+        color: #b3b3b3 !important;
+        font-size: 1.1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
+        opacity: 1 !important;
+    }
+
+    .heart-btn:hover {
+        color: #1ed760 !important;
+        background: rgba(30, 215, 96, 0.1) !important;
+        transform: scale(1.1) !important;
+    }
+    
+    .heart-btn.liked {
+        color: #1ed760 !important;
+        background: none !important;
+        border: none !important;
+    }
+
+    .heart-btn.liked:hover {
+        background: rgba(30, 215, 96, 0.15) !important;
+        transform: scale(1.15) !important;
+    }
+    
+    .kebab {
+        width: 32px !important;
+        height: 32px !important;
+        margin-left: 8px !important;
+        background: none !important;
+        border: none !important;
+        border-radius: 50% !important;
+        color: #b3b3b3 !important;
+        font-size: 1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: color 0.2s !important;
+        padding: 0.5rem !important;
+        opacity: 1 !important;
+    }
+    
+    .kebab:hover {
+        color: #fff !important;
+        background: none !important;
+    }
+    
+    /* Albums - 2xN grid for mobile */
+    #albums-row.card-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+        overflow-x: visible !important;
+        padding-bottom: 0 !important;
+    }
+    
+    #albums-row .card {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        min-width: auto !important;
+        max-width: none !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        position: relative !important;
+        margin-bottom: 0 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    #albums-row .card:hover {
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    #albums-row .card-cover {
+        width: 100% !important;
+        aspect-ratio: 1/1 !important;
+        margin-right: 0 !important;
+        margin-bottom: 8px !important;
+        border-radius: 8px !important;
+        object-fit: cover !important;
+        box-shadow: none !important;
+    }
+    
+    #albums-row .card-info {
+        padding: 0 !important;
+        width: 100% !important;
+        overflow: visible !important;
+    }
+    
+    #albums-row .card-title {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        color: #fff !important;
+        margin: 0 0 4px 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+    
+    #albums-row .card-artist {
+        font-size: 0.85rem !important;
+        color: #9ea0a3 !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        line-height: 1.2 !important;
+        text-align: left !important;
+    }
+    
+    #mixes-row .heart-btn,
+    #albums-row .heart-btn,
+    #albums-row .album-heart-btn {
+        position: absolute !important;
+        top: 0.75rem !important;
+        right: 0.75rem !important;
+        width: 32px !important;
+        height: 32px !important;
+        background: none !important;
+        border: none !important;
+        border-radius: 50% !important;
+        color: #b3b3b3 !important;
+        font-size: 1.1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
+        opacity: 1 !important;
+        margin-left: 0 !important;
+    }
+
+    #mixes-row .heart-btn:hover,
+    #albums-row .heart-btn:hover,
+    #albums-row .album-heart-btn:hover {
+        color: #1ed760 !important;
+        background: rgba(30, 215, 96, 0.1) !important;
+        transform: scale(1.1) !important;
+    }
+    
+    #mixes-row .heart-btn.liked,
+    #albums-row .heart-btn.liked,
+    #albums-row .album-heart-btn.liked {
+        color: #1ed760 !important;
+        background: none !important;
+    }
+
+    #mixes-row .heart-btn.liked:hover,
+    #albums-row .heart-btn.liked:hover,
+    #albums-row .album-heart-btn.liked:hover {
+        background: rgba(30, 215, 96, 0.15) !important;
+        transform: scale(1.15) !important;
+    }
+
+    #albums-row .album-more-btn {
+        position: absolute !important;
+        top: 0.75rem !important;
+        right: calc(0.75rem + 40px) !important;
+        width: 32px !important;
+        height: 32px !important;
+        background: none !important;
+        border: none !important;
+        color: #b3b3b3 !important;
+        font-size: 1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
+        opacity: 1 !important;
+    }
+
+    #albums-row .album-more-btn:hover {
+        color: #fff !important;
+    }
+    
+    /* Artists - 3xN grid for mobile */
+    .artist-row {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        overflow-x: visible !important;
+        align-items: start !important;
+    }
+    
+    .artist-tile {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 16px !important;
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 8px !important;
+        transition: background-color 0.2s !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    .artist-tile:hover {
+        background: #222 !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    .artist-avatar {
+        width: 64px !important;
+        height: 64px !important;
+        border-radius: 50% !important;
+        margin-bottom: 8px !important;
+        object-fit: cover !important;
+        box-shadow: none !important;
+    }
+    
+    .artist-name {
+        font-size: 0.82rem !important;
+        font-weight: 500 !important;
+        color: #fff !important;
+        line-height: 1.2 !important;
+        line-clamp: 2 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        white-space: normal !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* Mobile UX improvements */
+    body {
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 70px;
+    }
+    
+    /* Larger tap targets on mobile */
+    button, .btn, .heart-btn, .album-heart-btn { 
+        min-height: 44px; 
+        min-width: 44px; 
+    }
+    .heart-btn, .album-heart-btn { 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+    }
+    .filter-btn { 
+        min-height: 36px; 
+    }
+    
+    /* Reduce motion if user prefers */
+    @media (prefers-reduced-motion: reduce) {
+        * { 
+            animation-duration: .01ms !important; 
+            animation-iteration-count: 1 !important; 
+            transition-duration: .01ms !important; 
+            scroll-behavior: auto !important; 
+        }
+    }
+}
+
+/* Mobile: Tracks and Mixes - single column */
+@media (max-width: 900px) {
+    /* Tracks - single column on mobile */
+    #tracks-row.card-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    #tracks-row .card {
+        width: 100% !important;
+        max-width: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 12px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 8px !important;
+        margin-bottom: 0 !important;
+        height: auto !important;
+        min-height: 80px !important;
+    }
+    
+    #tracks-row .card-cover {
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 8px !important;
+        margin-right: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    #tracks-row .card-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    #tracks-row .card-title {
+        font-size: 1.35rem !important;
+        font-weight: 600 !important;
+        color: #fff !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 1 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    #tracks-row .card-artist {
+        font-size: 1.05rem !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        line-height: 1.2 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 1 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    #tracks-row .heart-btn, #tracks-row .kebab {
+        margin-left: 8px !important;
+        flex-shrink: 0 !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        font-size: 1.1rem !important;
+        background: none !important;
+        border: none !important;
+        color: #b3b3b3 !important;
+        opacity: 1 !important;
+    }
+    
+    #tracks-row .heart-btn:hover {
+        color: #1ed760 !important;
+        background: rgba(30, 215, 96, 0.1) !important;
+    }
+
+    #tracks-row .heart-btn.liked {
+        color: #1ed760 !important;
+    }
+    
+    #tracks-row .kebab:hover {
+        color: #fff !important;
+    }
+    
+    /* Mixes - EXACT COPY of tracks on mobile */
+    #mixes-row.card-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    #mixes-row .card {
+        width: 100% !important;
+        max-width: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        padding: 12px !important;
+        background: rgba(255, 255, 255, 0.05) !important;
+        border-radius: 8px !important;
+        margin-bottom: 0 !important;
+        height: auto !important;
+        min-height: 80px !important;
+    }
+    
+    #mixes-row .card-cover {
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 8px !important;
+        margin-right: 12px !important;
+        flex-shrink: 0 !important;
+    }
+    
+    #mixes-row .card-info {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    #mixes-row .card-title {
+        font-size: 1.35rem !important;
+        font-weight: 600 !important;
+        color: #fff !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 1 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    #mixes-row .card-artist {
+        font-size: 1.05rem !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        line-height: 1.2 !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 1 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    
+    #mixes-row .heart-btn, #mixes-row .kebab {
+        margin-left: 8px !important;
+        flex-shrink: 0 !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        min-height: 32px !important;
+        font-size: 1.1rem !important;
+        background: none !important;
+        border: none !important;
+        color: #b3b3b3 !important;
+        opacity: 1 !important;
+    }
+    
+    #mixes-row .heart-btn:hover {
+        color: #1ed760 !important;
+        background: rgba(30, 215, 96, 0.1) !important;
+    }
+
+    #mixes-row .heart-btn.liked {
+        color: #1ed760 !important;
+    }
+    
+    #mixes-row .kebab:hover {
+        color: #fff !important;
+    }
+    
+    /* Artists - horizontal scroll with large avatars on mobile */
+    #artists-row.artist-row {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 16px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding-bottom: 8px !important;
+        align-items: flex-start !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+    }
+    
+    #artists-row.artist-row::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    #artists-row .artist-tile {
+        min-width: 100px !important;
+        max-width: 100px !important;
+        width: 100px !important;
+        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        transition: none !important;
+        box-shadow: none !important;
+        transform: none !important;
+        flex-shrink: 0 !important;
+    }
+    
+    #artists-row .artist-tile:hover {
+        background: transparent !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+    
+    #artists-row .artist-avatar {
+        width: 100px !important;
+        height: 100px !important;
+        border-radius: 50% !important;
+        margin-bottom: 8px !important;
+        object-fit: cover !important;
+        box-shadow: none !important;
+    }
+    
+    #artists-row .artist-name {
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        color: #fff !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+    }
+    
+}
+
+/* Context menu for kebab button - modern design */
+.context-menu {
+    position: absolute !important;
+    background: rgba(40, 40, 40, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 6px !important;
+    min-width: 200px !important;
+    z-index: 1000 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+    display: none !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    animation: contextMenuFadeIn 0.15s ease-out !important;
+    overflow: hidden !important;
+}
+
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.context-menu.show {
+    display: block !important;
+}
+
+.context-menu-item {
+    padding: 12px 16px !important;
+    color: #fff !important;
+    cursor: pointer !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    text-align: left !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    border-radius: 8px !important;
+    margin: 2px 0 !important;
+    position: relative !important;
+}
+
+.context-menu-item::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(90deg, rgba(30, 215, 96, 0.1) 0%, transparent 100%) !important;
+    opacity: 0 !important;
+    transition: opacity 0.15s ease !important;
+    border-radius: 8px !important;
+    pointer-events: none !important;
+}
+
+.context-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    transform: translateX(2px) !important;
+}
+
+.context-menu-item:hover::before {
+    opacity: 1 !important;
+}
+
+.context-menu-item:active {
+    background: rgba(255, 255, 255, 0.12) !important;
+    transform: translateX(1px) !important;
+}
+
+.context-menu-item:first-child {
+    margin-top: 0 !important;
+}
+
+.context-menu-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Mobile-specific adjustments for context menu */
+@media (max-width: 900px) {
+    .context-menu {
+        min-width: 180px !important;
+        padding: 4px !important;
+        border-radius: 10px !important;
+    }
+    
+    .context-menu-item {
+        padding: 14px 16px !important;
+        font-size: 0.9rem !important;
+        gap: 10px !important;
+    }
+    
+    .context-menu-item i {
+        font-size: 0.85rem !important;
+    }
+}

@@ -1,0 +1,424 @@
+' =============================================================================
+' Muzic2 — полный набор UML-диаграмм для диплома
+' Рендер: https://www.plantuml.com/plantuml/uml/
+'       или расширение PlantUML в VS Code / draw.io (импорт .puml)
+' =============================================================================
+
+@startuml Muzic2_UseCase
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+title Диаграмма вариантов использования — Muzic2
+
+actor "Гость" as Guest
+actor "Пользователь" as User
+actor "Администратор" as Admin
+
+rectangle "Веб-сервис Muzic2" {
+  usecase "Просмотр главной\n(каталог, подборки)" as UC1
+  usecase "Поиск треков,\nартистов, альбомов" as UC2
+  usecase "Воспроизведение\n(плеер, очередь)" as UC3
+  usecase "Пульс\n(персональный поток)" as UC4
+  usecase "Регистрация /\nвход / выход" as UC5
+  usecase "Моя музыка:\nлайки, плейлисты,\nальбомы" as UC6
+  usecase "Создание /\nудаление плейлиста" as UC7
+  usecase "Просмотр альбома\n/ артиста" as UC8
+  usecase "Админ-панель:\nартисты, релизы,\nтреки" as UC9
+  usecase "Загрузка обложек\nи медиафайлов" as UC10
+}
+
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+
+Admin --> UC5
+Admin --> UC9
+Admin --> UC10
+
+UC6 ..> UC5 : <<include>>
+UC7 ..> UC5 : <<include>>
+UC4 ..> UC3 : <<include>>
+UC6 ..> UC3 : <<extend>>
+
+@enduml
+
+
+@startuml Muzic2_Classes
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+title Концептуальная диаграмма классов (предметная область)
+
+class User {
+  +id: int
+  +username: string
+  +email: string
+  +password: string
+  +created_at: datetime
+}
+
+class Track {
+  +id: int
+  +title: string
+  +artist: string
+  +album: string
+  +album_type: enum
+  +duration: int
+  +file_path: string
+  +cover: string
+  +video_url: string
+  +explicit: bool
+}
+
+class Artist {
+  +id: int
+  +name: string
+  +cover: string
+  +bio: text
+}
+
+class Playlist {
+  +id: int
+  +name: string
+  +is_public: bool
+  +cover: string
+  +user_id: int
+}
+
+class PlaylistTrack {
+  +playlist_id: int
+  +track_id: int
+  +position: int
+}
+
+class Like {
+  +user_id: int
+  +track_id: int
+  +created_at: datetime
+}
+
+class AlbumLike {
+  +user_id: int
+  +album_title: string
+}
+
+class History {
+  +id: int
+  +user_id: int
+  +track_id: int
+  +played_at: datetime
+}
+
+class Tag {
+  +id: int
+  +name: string
+}
+
+class Lyrics {
+  +track_id: int
+  +lrc_text: text
+}
+
+class Genre {
+  +id: int
+  +name: string
+}
+
+User "1" -- "0..*" Playlist : создаёт
+User "1" -- "0..*" Like : ставит
+User "1" -- "0..*" AlbumLike : отмечает
+User "1" -- "0..*" History : слушает
+
+Playlist "1" *-- "0..*" PlaylistTrack : содержит
+Track "1" -- "0..*" PlaylistTrack
+
+Track "0..*" -- "0..*" Genre : track_genres
+Track "0..*" -- "0..*" Tag : track_tags
+Track "1" -- "0..1" Lyrics
+Artist "1" -- "0..*" Track : исполняет (логически)
+
+@enduml
+
+
+@startuml Muzic2_Components
+skinparam componentStyle rectangle
+title Диаграмма компонентов
+
+package "Клиент (браузер)" {
+  [app.js\nSPA-интерфейс] as UI
+  [HTML / CSS\nindex.php] as View
+  [Audio Player\n+ очередь] as Player
+}
+
+package "Сервер PHP (MAMP)" {
+  together {
+    [windows_auth.php\nuser_windows.php] as AuthAPI
+    [windows_likes.php] as LikesAPI
+    [playlists.php\nplaylists_windows.php] as PlAPI
+    [home_windows.php\nsearch_windows.php] as CatalogAPI
+    [track_play.php\nlyrics.php] as PlayAPI
+    [album_windows.php\nartist_windows.php] as MetaAPI
+    [upload_cover.php] as Upload
+  }
+  package "Админ-панель" {
+    [index_ultra_fast.php\n?api=1] as AdminUI
+    [api/artists.php\napi/tracks.php] as AdminAPI
+  }
+  [session_init.php\ndb.php] as Config
+}
+
+database "MySQL\n(БД muzic2)" as DB
+folder "Файловое\nхранилище\ntracks/" as FS
+
+UI --> View
+UI --> Player
+UI --> AuthAPI : JSON + cookie
+UI --> LikesAPI
+UI --> PlAPI
+UI --> CatalogAPI
+UI --> PlayAPI
+UI --> MetaAPI
+UI --> Upload
+
+AdminUI --> AdminAPI
+AdminAPI --> Config
+AuthAPI --> Config
+LikesAPI --> Config
+PlAPI --> Config
+CatalogAPI --> Config
+PlayAPI --> Config
+MetaAPI --> Config
+Config --> DB
+Upload --> FS
+PlayAPI --> FS
+
+@enduml
+
+
+@startuml Muzic2_Deployment
+title Диаграмма развёртывания
+
+node "Рабочая станция пользователя" {
+  artifact "Браузер\n(Chrome, Edge…)" as Browser
+}
+
+node "Сервер разработки MAMP" {
+  artifact "Apache\n+ PHP 8.x" as Apache
+  artifact "MySQL / MariaDB" as MySQL
+  folder "/muzic2/public\n(статика, точка входа)" as Public
+  folder "/muzic2/src/api\n(REST-подобные скрипты)" as API
+  folder "/muzic2/tracks\n(music, covers)" as Media
+}
+
+Browser --> Apache : HTTP\n:muzic2/
+Apache --> API
+Apache --> Public
+API --> MySQL : PDO
+API --> Media : read/write
+
+@enduml
+
+
+@startuml Muzic2_Sequence_Auth
+title Последовательность: авторизация пользователя
+
+actor User
+participant "app.js" as JS
+participant "windows_auth.php" as Auth
+database "MySQL" as DB
+
+User -> JS : логин + пароль
+JS -> Auth : POST {action: login}\ncredentials: include
+Auth -> Auth : session_start()\npassword_verify()
+Auth -> DB : SELECT users
+DB --> Auth : user row
+Auth -> Auth : $_SESSION[user_id]
+Auth --> JS : {success, user}
+JS -> JS : currentUser, localStorage
+JS --> User : главный интерфейс
+
+@enduml
+
+
+@startuml Muzic2_Sequence_MyMusic
+title Последовательность: раздел «Моя музыка»
+
+actor User
+participant "app.js" as JS
+participant "playlists_windows.php" as PlWin
+participant "windows_likes.php" as Likes
+database "MySQL" as DB
+
+User -> JS : открыть «Моя музыка»
+JS -> JS : проверка currentUser
+
+par параллельно
+  JS -> PlWin : GET playlists\n(session)
+  PlWin -> DB : SELECT playlists\n+ track_count
+  DB --> PlWin : список
+  PlWin --> JS : JSON playlists
+else
+  JS -> Likes : GET tracks, albums
+  Likes -> DB : JOIN likes, tracks\nalbum_likes
+  DB --> Likes : данные
+  Likes --> JS : JSON
+end
+
+JS -> JS : отрисовка карточек\nлайки / плейлисты
+JS --> User : экран «Моя музыка»
+
+@enduml
+
+
+@startuml Muzic2_Sequence_CreatePlaylist
+title Последовательность: создание плейлиста
+
+actor User
+participant "app.js" as JS
+participant "upload_cover.php" as Up
+participant "playlists.php" as Pl
+database "MySQL" as DB
+
+User -> JS : модалка: имя, треки,\nобложка (опц.)
+opt файл обложки
+  JS -> Up : POST multipart cover
+  Up --> JS : path
+end
+JS -> JS : cover из 1-го трека\nесли пусто
+JS -> Pl : POST {name, track_ids, cover}
+Pl -> DB : INSERT playlists
+Pl -> DB : INSERT playlist_tracks
+DB --> Pl : playlist_id
+Pl --> JS : {success}
+JS -> JS : renderMyMusic()
+JS --> User : обновлённый список
+
+@enduml
+
+
+@startuml Muzic2_Activity_Pulse
+title Диаграмма активности: «Пульс»
+
+start
+:Пользователь нажимает «Пульс»;
+if (Авторизован?) then (да)
+else (нет)
+  :Экран входа;
+  stop
+endif
+:Запрос рекомендаций\n(home / smart_mix API);
+:Формирование очереди треков;
+if (Очередь пуста?) then (да)
+  :Сообщение «нет треков»;
+  stop
+else (нет)
+endif
+:playTrack(queue);
+repeat
+  :Воспроизведение трека;
+  :Обновление UI плеера;
+  if (ended / next?) then (следующий)
+  else (стоп)
+    stop
+  endif
+repeat while (есть треки в очереди?)
+stop
+
+@enduml
+
+
+@startuml Muzic2_State_Session
+title Диаграмма состояний: сессия пользователя
+
+[*] --> Guest : открытие сайта
+
+state Guest {
+  Guest : нет user_id\nв cookie
+}
+
+state Authenticated {
+  Authenticated : $_SESSION[user_id]
+}
+
+Guest --> Authenticated : POST login OK
+Authenticated --> Guest : logout /\nсессия истекла
+Authenticated --> [*] : закрытие вкладки
+
+@enduml
+
+
+@startuml Muzic2_ER
+hide methods
+skinparam linetype ortho
+title ER-диаграмма (основные таблицы MySQL)
+
+entity users {
+  * id : INT <<PK>>
+  --
+  username
+  email
+  password
+}
+
+entity tracks {
+  * id : INT <<PK>>
+  --
+  title, artist, album
+  file_path, cover, duration
+}
+
+entity genres {
+  * id : INT <<PK>>
+  name
+}
+
+entity track_genres {
+  * track_id <<FK>>
+  * genre_id <<FK>>
+}
+
+entity playlists {
+  * id : INT <<PK>>
+  user_id <<FK>>
+  name
+  is_public
+}
+
+entity playlist_tracks {
+  * playlist_id <<FK>>
+  * track_id <<FK>>
+  position
+}
+
+entity likes {
+  * user_id <<FK>>
+  * track_id <<FK>>
+}
+
+entity history {
+  * id : INT <<PK>>
+  user_id <<FK>>
+  track_id <<FK>>
+  played_at
+}
+
+users ||--o{ playlists
+users ||--o{ likes
+users ||--o{ history
+playlists ||--o{ playlist_tracks
+tracks ||--o{ playlist_tracks
+tracks ||--o{ likes
+tracks ||--o{ history
+tracks ||--o{ track_genres
+genres ||--o{ track_genres
+
+@enduml

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Импорт данных в БД</title>
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0f0f10; color:#fff; }
+    .wrap { max-width: 920px; margin: 28px auto; padding: 0 16px; }
+    h1 { margin: 0 0 14px; }
+    .hint { color:#b8b8b8; margin-bottom: 16px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+    .card { background:#17181c; border:1px solid #2b2e34; border-radius:12px; padding:14px; }
+    .card h3 { margin:0 0 8px; font-size: 18px; }
+    .card p { margin:0 0 12px; color:#b8b8b8; min-height:40px; }
+    .btn { border:0; border-radius:10px; padding:10px 12px; font-weight:700; cursor:pointer; }
+    .btn.primary { background:#1ed760; color:#09110b; }
+    .btn:disabled { opacity:.55; cursor:default; }
+    .logs { margin-top:14px; background:#0d0e11; border:1px solid #2b2e34; border-radius:12px; padding:12px; min-height:180px; white-space:pre-wrap; }
+    .row { display:flex; gap:8px; align-items:center; margin-top:10px; }
+    .muted { color:#8f95a3; font-size:13px; }
+    a { color:#78a7ff; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Импорт данных в базу</h1>
+    <div class="hint">
+      Запускайте по шагам: сначала треки, потом тексты, потом видео.
+      Источники: <code>tracks/music</code> и <code>tracks/videos</code>.
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>1) Импорт треков</h3>
+        <p>Добавляет недостающие аудиофайлы в таблицу <code>tracks</code>.</p>
+        <button class="btn primary" id="btn-tracks">Импортировать треки</button>
+      </div>
+      <div class="card">
+        <h3>2) Импорт текстов (.lrc)</h3>
+        <p>Привязывает файлы .lrc к трекам в таблицу <code>lyrics</code>.</p>
+        <button class="btn primary" id="btn-lyrics">Импортировать тексты</button>
+      </div>
+      <div class="card">
+        <h3>3) Импорт видео</h3>
+        <p>Привязывает видеофайлы к полю <code>tracks.video_url</code>.</p>
+        <button class="btn primary" id="btn-videos">Импортировать видео</button>
+      </div>
+      <div class="card">
+        <h3>4) Исправить импорт</h3>
+        <p>Исправляет кривые записи: <code>Неизвестный артист</code>, общий альбом <code>Синглы</code>, числовые артисты.</p>
+        <button class="btn primary" id="btn-repair">Исправить треки</button>
+      </div>
+      <div class="card">
+        <h3>5) Откатить импорт</h3>
+        <p>Удаляет только недавно импортированные треки (по сигнатуре импорта), старые треки не трогает.</p>
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+          <label for="rollback-minutes" class="muted">Окно (мин):</label>
+          <input id="rollback-minutes" type="number" value="180" min="5" max="1440" style="width:100px;background:#0f1113;color:#fff;border:1px solid #2b2e34;border-radius:8px;padding:8px;">
+        </div>
+        <button class="btn" id="btn-rollback" style="background:#a33;color:#fff;">Откатить импорт</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="btn" id="btn-all">Запустить всё по очереди</button>
+      <span class="muted">Рекомендуется после обновления файлов в папках.</span>
+    </div>
+
+    <div class="logs" id="logs">Готово к запуску.</div>
+    <div class="muted" style="margin-top:8px;">API: <code>/muzic2/public/admin/api/import_data.php</code></div>
+  </div>
+
+  <script>
+    const logs = document.getElementById('logs');
+    const btnTracks = document.getElementById('btn-tracks');
+    const btnLyrics = document.getElementById('btn-lyrics');
+    const btnVideos = document.getElementById('btn-videos');
+    const btnRepair = document.getElementById('btn-repair');
+    const btnRollback = document.getElementById('btn-rollback');
+    const rollbackMinutes = document.getElementById('rollback-minutes');
+    const btnAll = document.getElementById('btn-all');
+
+    function log(msg){
+      const ts = new Date().toLocaleTimeString();
+      logs.textContent += `\n[${ts}] ${msg}`;
+      logs.scrollTop = logs.scrollHeight;
+    }
+    function setBusy(on){
+      [btnTracks, btnLyrics, btnVideos, btnRepair, btnRollback, btnAll].forEach(b => b.disabled = !!on);
+    }
+
+    async function run(action){
+      setBusy(true);
+      log(`Запуск: ${action} ...`);
+      try {
+        const r = await fetch(`/muzic2/public/admin/api/import_data.php?action=${encodeURIComponent(action)}`, { method:'POST' });
+        const j = await r.json().catch(()=>null);
+        if (!r.ok || !j || !j.success) throw new Error((j && j.message) || `HTTP ${r.status}`);
+        log(`OK (${action}): ${JSON.stringify(j)}`);
+      } catch (e) {
+        log(`Ошибка (${action}): ${e.message || e}`);
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    btnTracks.onclick = () => run('tracks');
+    btnLyrics.onclick = () => run('lyrics');
+    btnVideos.onclick = () => run('videos');
+    btnRepair.onclick = () => run('repair_tracks');
+    btnRollback.onclick = async () => {
+      if (!confirm('Откатить недавно импортированные треки? Старые треки останутся.')) return;
+      const m = Number((rollbackMinutes && rollbackMinutes.value) || 180) || 180;
+      setBusy(true);
+      log(`Запуск: rollback_import (${m} мин) ...`);
+      try {
+        const r = await fetch(`/muzic2/public/admin/api/import_data.php?action=rollback_import&minutes=${encodeURIComponent(String(m))}`, { method:'POST' });
+        const j = await r.json().catch(()=>null);
+        if (!r.ok || !j || !j.success) throw new Error((j && j.message) || `HTTP ${r.status}`);
+        log(`OK (rollback_import): ${JSON.stringify(j)}`);
+      } catch (e) {
+        log(`Ошибка (rollback_import): ${e.message || e}`);
+      } finally {
+        setBusy(false);
+      }
+    };
+    btnAll.onclick = async () => {
+      setBusy(true);
+      try {
+        await run('tracks');
+        await run('lyrics');
+        await run('videos');
+        await run('repair_tracks');
+      } finally {
+        setBusy(false);
+      }
+    };
+  </script>
+</body>
+</html>
+

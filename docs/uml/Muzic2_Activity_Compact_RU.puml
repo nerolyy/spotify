@@ -1,0 +1,34 @@
+@startuml
+scale max 700 width
+skinparam activityFontSize 10
+skinparam shadowing false
+title Muzic2 - aktivnost (kratko)
+
+start
+:Открыть сайт;
+if (Авторизован?) then (нет)
+  :Вход / регистрация;
+  if (OK?) then (нет)
+    stop
+  endif
+endif
+:Главная;
+repeat
+  if (Раздел?) then (Главная)
+    :Каталог, Пульс;
+  elseif (Поиск)
+    :Поиск;
+  elseif (Моя музыка)
+    :Лайки, плейлисты;
+  elseif (Альбом / артист)
+    :Карточка релиза;
+  elseif (Выход)
+    stop
+  else (Плеер)
+    :Воспроизведение;
+  endif
+repeat while (да?) is (да)
+->нет;
+stop
+
+@enduml

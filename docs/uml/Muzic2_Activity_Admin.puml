@@ -1,0 +1,50 @@
+@startuml
+title Admin-panel Muzic2
+
+skinparam activityFontSize 11
+
+|Administrator|
+start
+:Otkryt index_ultra_fast.php;
+
+repeat
+  if (Vkladka?) then (Artisty)
+    partition artists {
+      if (API?) then (GET)
+        :Spisok artistov;
+      elseif (create)
+        :INSERT artists;
+      elseif (update)
+        :UPDATE artists;
+      elseif (delete)
+        :DELETE artists;
+      endif
+    }
+  elseif (Albomy) then
+    partition albums {
+      if (API?) then (GET)
+      elseif (create)
+        :INSERT album track;
+      elseif (update)
+        :UPDATE tracks;
+      elseif (delete)
+        :DELETE album tracks;
+      endif
+    }
+  else (Treki)
+    partition tracks {
+      if (API?) then (GET)
+      elseif (create)
+        :INSERT tracks;
+      elseif (update)
+        :UPDATE by id;
+      elseif (delete)
+        :DELETE by id;
+      endif
+    }
+  endif
+repeat while (V paneli?) is (da)
+->net;
+stop
+
+@enduml

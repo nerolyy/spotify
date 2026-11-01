@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Музыкальный плеер</title>
+  <style>
+    body { background: #181818; color: #fff; margin: 0; font-family: 'Inter', Arial, sans-serif; }
+    #player { display: flex; align-items: center; gap: 1rem; padding: 1.2rem; }
+    #cover { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #222; }
+    #track-title { font-size: 1.1rem; font-weight: 600; color: #fff; }
+    #track-artist { font-size: 0.98rem; color: #b3b3b3; }
+    #controls button { background: #232323; color: #fff; border: none; border-radius: 50%; width: 38px; height: 38px; font-size: 1.2rem; margin: 0 0.2rem; cursor: pointer; }
+    #controls button#play { background: #1db954; color: #fff; font-size: 1.5rem; }
+    #controls button#play:active { background: #17a74a; }
+    #seek { width: 120px; }
+  </style>
+</head>
+<body>
+  <div id="player">
+    <button id="back" title="Назад" style="position:fixed;left:12px;top:12px;width:40px;height:40px;border-radius:50%;border:none;background:#1f1f1f;color:#fff;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);display:grid;place-items:center;">
+      ←
+    </button>
+    <img id="cover" src="" alt="cover">
+    <div>
+      <div id="track-title">—</div>
+      <div id="track-artist">—</div>
+      <input type="range" id="seek" min="0" max="100" value="0">
+    </div>
+    <div id="controls">
+      <button id="play">▶</button>
+      <button id="pause">⏸</button>
+    </div>
+    <audio id="audio"></audio>
+    <video id="video" style="display:none;width:100%;max-height:60vh;"></video>
+  </div>
+  <script>
+    const audio = document.getElementById('audio');
+    const video = document.getElementById('video');
+    const backBtn = document.getElementById('back');
+    const playBtn = document.getElementById('play');
+    const pauseBtn = document.getElementById('pause');
+    const seek = document.getElementById('seek');
+    const cover = document.getElementById('cover');
+    const title = document.getElementById('track-title');
+    const artist = document.getElementById('track-artist');
+    function isVideoSrc(src){ return /\.(mp4|webm|ogg)(\?|$)/i.test(String(src||'')); }
+    function getActiveMedia(){ return (video.style.display !== 'none') ? video : audio; }
+    function useMediaForSrc(src){ if(isVideoSrc(src)){ video.style.display=''; audio.pause(); audio.removeAttribute('src'); } else { video.pause(); video.style.display='none'; video.removeAttribute('src'); } }
+
+    // Управление
+    playBtn.onclick = () => getActiveMedia().play();
+    pauseBtn.onclick = () => getActiveMedia().pause();
+    seek.oninput = () => {
+      const m = getActiveMedia();
+      if (m.duration) m.currentTime = (seek.value / 100) * m.duration;
+    };
+    function bind(el){
+      el.ontimeupdate = () => { seek.value = el.duration ? (el.currentTime / el.duration) * 100 : 0; sendState(); };
+      el.onplay = el.onpause = sendState;
+      el.addEventListener('loadedmetadata', sendState);
+      el.addEventListener('volumechange', sendState);
+      el.addEventListener('ended', () => { sendState(); window.opener && window.opener.postMessage({ cmd: 'playerEnded' }, '*'); });
+    }
+    bind(audio); bind(video);
+
+    // Notify opener that popup is ready
+    try { window.opener && window.opener.postMessage({ cmd: 'popupReady' }, '*'); } catch (e) {}
+
+    backBtn.onclick = () => {
+      try {
+        if (window.history && window.history.length > 1) window.history.back();
+        else window.close();
+      } catch (e) {
+        window.close();
+      }
+    };
+
+    // Получение команд
+    window.addEventListener('message', (e) => {
+      if (!e.data || typeof e.data !== 'object') return;
+      if (e.data.cmd === 'playTrack') {
+        useMediaForSrc(e.data.src);
+        const m = getActiveMedia();
+        m.src = e.data.src;
+        title.textContent = e.data.title || '';
+        artist.textContent = e.data.artist || '';
+        cover.src = e.data.cover || '';
+        m.currentTime = e.data.currentTime || 0;
+        m.volume = e.data.volume !== undefined ? e.data.volume : 1;
+        if (e.data.autoplay) m.play();
+      }
+      if (e.data.cmd === 'setVolume') {
+        getActiveMedia().volume = e.data.volume;
+      }
+      if (e.data.cmd === 'seek') {
+        getActiveMedia().currentTime = e.data.currentTime;
+      }
+      if (e.data.cmd === 'play') getActiveMedia().play();
+      if (e.data.cmd === 'pause') getActiveMedia().pause();
+    });
+
+    // Отправка состояния
+    function sendState() {
+      const m = getActiveMedia();
+      window.opener && window.opener.postMessage({
+        cmd: 'playerState',
+        src: m.currentSrc || m.src,
+        title: title.textContent,
+        artist: artist.textContent,
+        cover: cover.src,
+        currentTime: m.currentTime,
+        duration: m.duration,
+        isPlaying: !m.paused,
+        volume: m.volume
+      }, '*');
+    }
+  </script>
+</body>
+</html> 

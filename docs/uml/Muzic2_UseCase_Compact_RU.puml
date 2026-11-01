@@ -1,0 +1,41 @@
+@startuml
+scale max 900 width
+skinparam defaultFontSize 10
+skinparam usecaseFontSize 10
+skinparam shadowing false
+title Варианты использования Muzic2 (кратко)
+
+top to bottom direction
+
+actor "Гость" as G
+actor "Пользователь" as U
+actor "Админ" as A
+
+rectangle "Muzic2" {
+  usecase UC1 as "Авторизация"
+  usecase UC2 as "Главная и каталог"
+  usecase UC3 as "Поиск"
+  usecase UC4 as "Моя музыка"
+  usecase UC5 as "Альбом / артист"
+  usecase UC6 as "Плеер и Пульс"
+  usecase UC7 as "Админ-панель"
+}
+
+G --> UC2
+G --> UC3
+G --> UC6
+
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+U --> UC6
+
+A --> UC1
+A --> UC7
+
+UC6 ..> UC1 : include
+UC4 ..> UC1 : include
+
+@enduml

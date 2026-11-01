@@ -1,0 +1,9 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target arm64-apple-ios14.0 -enable-objc-interop -swift-version 5 -enforce-exclusivity=checked -Onone -enable-bare-slash-regex -module-name Muzic2App
+import Swift
+import UIKit
+import WebKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims

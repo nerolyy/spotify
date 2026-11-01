@@ -1,0 +1,6 @@
+tracks/*.mp3
+tracks/*.m4a
+tracks/*.wav
+.db
+.DS_Store
+node_modules/

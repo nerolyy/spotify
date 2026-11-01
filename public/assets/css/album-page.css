@@ -1,0 +1,607 @@
+/* ============================================
+   СТРАНИЦА АЛЬБОМА - СОВРЕМЕННЫЙ ДИЗАЙН
+   Вдохновлено Spotify, Apple Music, Tidal
+   ============================================ */
+
+/* Общий контейнер страницы альбома */
+#main-content:has(.album-page-container) {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+  background: #181818;
+}
+
+/* Контейнер страницы альбома */
+.album-page-container {
+  position: relative;
+  padding-bottom: 120px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(80, 55, 80, 0.3) 0%, #181818 30%);
+}
+
+/* ============================================
+   ЗАГОЛОВОК АЛЬБОМА - ГЕРОЙ СЕКЦИЯ
+   ============================================ */
+.album-hero {
+  padding: 2rem 2rem 2.5rem;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  position: relative;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+}
+
+.album-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+/* Обложка альбома */
+.album-hero-cover {
+  width: 232px;
+  height: 232px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  background: #282828;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.album-hero-cover:hover {
+  transform: scale(1.02);
+}
+
+/* Мета информация альбома */
+.album-hero-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
+.album-hero-type {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.album-hero-title {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: -0.02em;
+  word-wrap: break-word;
+}
+
+.album-hero-artist {
+  font-size: 1.125rem;
+  color: #fff;
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.album-hero-artist a,
+.album-hero-artist .artist-link {
+  color: #fff;
+  text-decoration: none;
+  transition: text-decoration 0.2s;
+}
+
+.album-hero-artist a:hover,
+.album-hero-artist .artist-link:hover {
+  text-decoration: underline;
+}
+
+.album-hero-info {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.album-hero-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Кнопки управления */
+.album-hero-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.album-play-btn-large {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1ed760;
+  border: none;
+  color: #000;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(30, 215, 96, 0.3);
+  transition: all 0.2s ease;
+  font-weight: 900;
+  padding-left: 4px;
+}
+
+.album-play-btn-large:hover {
+  background: #1db954;
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(30, 215, 96, 0.4);
+}
+
+.album-play-btn-large:active {
+  transform: scale(0.95);
+}
+
+.album-like-btn-large {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.album-like-btn-large:hover {
+  border-color: #fff;
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.album-like-btn-large.liked {
+  background: rgba(30, 215, 96, 0.2);
+  border-color: #1ed760;
+  color: #1ed760;
+}
+
+.album-like-btn-large.liked:hover {
+  background: rgba(30, 215, 96, 0.3);
+  border-color: #1db954;
+  color: #1db954;
+}
+
+/* Кнопка дополнительных действий */
+.album-more-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.album-more-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* ============================================
+   ТАБЛИЦА ТРЕКОВ - ПРЕМИУМ ДИЗАЙН
+   ============================================ */
+.album-tracks-section {
+  padding: 0 2rem 2rem;
+  margin-top: 0;
+}
+
+.album-tracks-header {
+  padding: 1rem 0 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  grid-template-columns: 32px 1fr auto 48px;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.album-tracks-header-number {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.album-tracks-header-title {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.album-tracks-header-duration {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-right: 1rem;
+}
+
+.album-tracks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.album-track-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto 48px;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  min-height: 56px;
+}
+
+.album-track-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.album-track-item.playing {
+  background: rgba(30, 215, 96, 0.1);
+}
+
+.album-track-item.playing .album-track-number,
+.album-track-item.playing .album-track-title-text {
+  color: #1ed760;
+}
+
+/* Номер трека */
+.album-track-number {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 0.2s ease;
+  position: relative;
+}
+
+.album-track-item:hover .album-track-number {
+  opacity: 0;
+}
+
+/* Кнопка воспроизведения в треке */
+.album-track-play-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  color: #000;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 2;
+  padding-left: 2px;
+  font-weight: 900;
+}
+
+.album-track-item:hover .album-track-play-btn {
+  opacity: 1;
+}
+
+.album-track-play-btn:hover {
+  transform: translateY(-50%) scale(1.1);
+  background: #1ed760;
+  color: #000;
+}
+
+.album-track-play-btn.playing {
+  opacity: 1;
+  background: #1ed760;
+  color: #000;
+}
+
+/* Заголовок трека */
+.album-track-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.album-track-title-text {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #fff;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.album-track-title-text .exp-badge {
+  font-size: 0.625rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.album-track-artist {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-track-artist .artist-link {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.album-track-artist .artist-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Длительность трека */
+.album-track-duration {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  padding-right: 1rem;
+}
+
+/* Кнопка лайка */
+.album-track-like {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.album-track-like-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.album-track-item:hover .album-track-like-btn {
+  opacity: 1;
+}
+
+.album-track-like-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.album-track-like-btn.liked {
+  color: #1ed760;
+  opacity: 1;
+}
+
+.album-track-like-btn.liked:hover {
+  color: #1db954;
+  background: rgba(30, 215, 96, 0.1);
+}
+
+/* ============================================
+   АНИМАЦИИ
+   ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.album-hero {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.album-tracks-section {
+  animation: fadeInUp 0.6s ease-out 0.2s backwards;
+}
+
+.album-track-item {
+  animation: fadeInUp 0.3s ease-out backwards;
+}
+
+.album-track-item:nth-child(1) { animation-delay: 0.3s; }
+.album-track-item:nth-child(2) { animation-delay: 0.32s; }
+.album-track-item:nth-child(3) { animation-delay: 0.34s; }
+.album-track-item:nth-child(4) { animation-delay: 0.36s; }
+.album-track-item:nth-child(5) { animation-delay: 0.38s; }
+.album-track-item:nth-child(n+6) { animation-delay: 0.4s; }
+
+/* ============================================
+   АДАПТИВНЫЙ ДИЗАЙН
+   ============================================ */
+@media (max-width: 768px) {
+  .album-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 1.5rem 2rem;
+  }
+
+  .album-hero-cover {
+    width: 192px;
+    height: 192px;
+    align-self: center;
+  }
+
+  .album-hero-meta {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+  }
+
+  .album-hero-title {
+    text-align: center;
+  }
+
+  .album-hero-controls {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .album-tracks-section {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .album-tracks-header {
+    grid-template-columns: 32px 1fr 40px;
+    gap: 0.75rem;
+  }
+
+  .album-tracks-header-duration {
+    padding-right: 0.5rem;
+  }
+
+  .album-track-item {
+    grid-template-columns: 32px 1fr 40px;
+    gap: 0.75rem;
+    padding: 0.5rem 0.5rem;
+  }
+
+  .album-track-duration {
+    padding-right: 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .album-track-like {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .album-hero {
+    padding: 1rem 1rem 1.5rem;
+  }
+
+  .album-hero-cover {
+    width: 160px;
+    height: 160px;
+  }
+
+  .album-hero-title {
+    font-size: 1.75rem;
+  }
+
+  .album-hero-artist {
+    font-size: 1rem;
+  }
+
+  .album-hero-info {
+    font-size: 0.8125rem;
+  }
+
+  .album-play-btn-large {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+
+  .album-like-btn-large {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .album-tracks-section {
+    padding: 0 0.75rem 1rem;
+  }
+
+  .album-track-item {
+    min-height: 48px;
+    padding: 0.4rem 0.4rem;
+  }
+
+  .album-track-title-text {
+    font-size: 0.9375rem;
+  }
+
+  .album-track-artist {
+    font-size: 0.8125rem;
+  }
+
+  .album-track-duration {
+    font-size: 0.75rem;
+  }
+}
+
+/* Дополнительные стили для скролла */
+.album-tracks-section {
+  max-height: none;
+}

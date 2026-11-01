@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Админка — очень просто</title>
+<style>
+  :root{--bg:#0f0f10;--panel:#16171a;--panel2:#1d1f23;--text:#e6e6e6;--muted:#a0a6ad;--accent:#1ed760;--border:#2a2d32;--ok:#8aff8a;--err:#ff9b9b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+  header{padding:16px;background:var(--panel);border-bottom:1px solid var(--border)}
+  .head{display:flex;gap:12px;align-items:center;justify-content:space-between}
+  .head-left{min-width:0}
+  .head-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .linkbtn{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:12px;border:2px solid var(--border);background:var(--panel2);color:var(--text);text-decoration:none;font-weight:900}
+  .linkbtn:hover{border-color:var(--accent)}
+  header h1{margin:0 0 6px}
+  header p{margin:0;color:var(--muted)}
+  .bar{display:flex;gap:10px;padding:12px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .tab{padding:14px 18px;border-radius:12px;border:2px solid var(--border);background:var(--panel2);cursor:pointer;font-weight:800}
+  .tab.active{border-color:var(--accent)}
+  .controls{display:flex;gap:10px;padding:12px;flex-wrap:wrap}
+  .controls input{padding:12px;border-radius:10px;border:1px solid var(--border);background:#0f1113;color:#fff;min-width:240px}
+  .btn{padding:12px 16px;border-radius:12px;border:0;background:#2a2f34;color:#fff;cursor:pointer;font-weight:800}
+  .btn.primary{background:var(--accent);color:#000}
+  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:12px}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:12px}
+  .card h3{margin:8px 0 4px}
+  .small{color:var(--muted);font-size:13px}
+  .img{width:100%;aspect-ratio:1;border-radius:12px;border:1px solid var(--border);object-fit:cover;background:#0e0f11}
+  .row{display:flex;gap:10px;margin-top:10px}
+  .status{padding:10px 12px}
+  .ok{color:var(--ok)} .err{color:var(--err)}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+  .box{background:#121317;border:1px solid var(--border);border-radius:14px;max-width:560px;width:100%;padding:16px;max-height:80vh;overflow:auto}
+  .field{margin:10px 0} .field label{display:block;margin-bottom:6px}
+  .field input,.field textarea,.field select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0f1113;color:#fff}
+  .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="head-left">
+      <h1>Административная панель</h1>
+    </div>
+    <div class="head-actions">
+      <a class="linkbtn" href="/muzic2/" title="Перейти на главную страницу сайта">На главную</a>
+    </div>
+  </div>
+</header>
+<div class="bar">
+  <button class="tab active" data-tab="artists">Артисты</button>
+  <button class="tab" data-tab="albums">Альбомы</button>
+  <button class="tab" data-tab="tracks">Треки</button>
+  <button class="tab" data-tab="reports">Отчёты</button>
+</div>
+<div class="controls">
+  <input id="search" placeholder="Поиск..." />
+  <button class="btn primary" id="add">+ Добавить</button>
+  <button class="btn" id="refresh-mixes" title="Сбросить кэш и пересобрать миксы дня на главной">Обновить миксы дня</button>
+</div>
+<div class="list" id="list"></div>
+<div class="status" id="status"></div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h2 id="mtitle">Редактирование</h2>
+    <div id="mbody"></div>
+    <div class="actions">
+      <button class="btn" id="close">Закрыть</button>
+      <button class="btn primary" id="save">Сохранить</button>
+    </div>
+    <div class="status" id="mstatus"></div>
+  </div>
+</div>
+
+<script>
+// Настройки
+const API = {
+  artists: '/muzic2/public/admin/api/artists.php',
+  albums:  '/muzic2/public/admin/api/albums.php',
+  tracks:  '/muzic2/public/admin/api/tracks.php',
+  genres:  '/muzic2/public/admin/api/genres.php',
+  home:    '/muzic2/public/admin/api/home.php',
+  stats:   '/muzic2/src/api/stats.php',
+  upload:  '/muzic2/public/upload_cover.php',
+  uploadVideo: '/muzic2/public/upload_video.php'
+};
+
+// DOM
+const tabs = document.querySelectorAll('.tab');
+const list = document.getElementById('list');
+const statusEl = document.getElementById('status');
+const search = document.getElementById('search');
+const add = document.getElementById('add');
+const modal = document.getElementById('modal');
+const mtitle = document.getElementById('mtitle');
+const mbody = document.getElementById('mbody');
+const mstatus = document.getElementById('mstatus');
+const closeBtn = document.getElementById('close');
+const saveBtn = document.getElementById('save');
+
+let tab = 'artists', items = [], current = null;
+let paging = { after: '', done: false, loading: false };
+let artistSuggestions = [];
+let artistSuggestionsLoaded = false;
+let genreOptions = [];
+let genreOptionsLoaded = false;
+
+let reportsState = { period: 'month', limit: 10 };
+
+function ok(t){statusEl.textContent=t||''; statusEl.className='status ok'}
+function err(t){statusEl.textContent=t||''; statusEl.className='status err'}
+function mok(t){mstatus.textContent=t||''; mstatus.className='status ok'}
+function merr(t){mstatus.textContent=t||''; mstatus.className='status err'}
+function esc(s){return String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function img(src){ if(!src) return ''; const p=src.startsWith('/muzic2/')?src:('/muzic2/'+src.replace(/^\//,'')); return `<img class="img" src="${p}" onerror="this.style.display='none'">`; }
+
+async function readJsonSafe(res){
+  const text = await res.text().catch(()=> '');
+  try {
+    return text ? JSON.parse(text) : null;
+  } catch (_) {
+    const status = res && typeof res.status === 'number' ? res.status : 0;
+    const prefix = status ? `HTTP ${status}. ` : '';
+    const body = text ? `Ответ сервера: ${text.slice(0, 300)}` : 'Пустой ответ от сервера';
+    throw new Error(prefix + body);
+  }
+}
+
+async function load(opts){
+  try{
+    if (tab === 'reports') {
+      await loadReports();
+      return;
+    }
+    const o = opts || {};
+    const reset = !!o.reset;
+    if (reset) {
+      items = [];
+      paging = { after: '', done: false, loading: false };
+      list.innerHTML = '';
+    }
+    if (paging.loading || paging.done) return;
+    paging.loading = true;
+    ok(items.length ? 'Загрузка ещё...' : 'Загрузка...');
+
+    const q = search.value.trim();
+    const qs = [];
+    if (q) qs.push(`q=${encodeURIComponent(q)}`);
+    qs.push(`limit=${encodeURIComponent(String(tab==='tracks' ? 80 : 100))}`);
+    if (paging.after) {
+      if (tab === 'tracks') qs.push(`after_id=${encodeURIComponent(String(paging.after))}`);
+      else qs.push(`after=${encodeURIComponent(String(paging.after))}`);
+    }
+    const url = API[tab] + (qs.length ? `?${qs.join('&')}` : '');
+    const r = await fetch(url);
+    const j = await readJsonSafe(r);
+    if (!j.success) throw new Error(j.message||'Ошибка');
+    const batch = j.data || [];
+    items = items.concat(batch);
+    render();
+
+    if (tab === 'tracks') paging.after = j.next_after_id ? String(j.next_after_id) : '';
+    else paging.after = j.next_after ? String(j.next_after) : '';
+    if (!paging.after || batch.length === 0) paging.done = true;
+
+    ok(items.length ? `Загружено: ${items.length}${paging.done ? '' : ' (можно ещё)'}` : 'Ничего не найдено');
+  }catch(e){ err(e.message) }
+  finally { paging.loading = false; }
+}
+
+function render(){
+  list.innerHTML='';
+  if (tab === 'reports') return;
+  if (tab==='artists'){
+    items.forEach(a=>{
+      const c=document.createElement('div'); c.className='card';
+      const cover = a.artist_cover || a.track_cover || '';
+      c.innerHTML = `${img(cover)}<h3>${esc(a.artist||'Без имени')}</h3><div class='small'>Треков: ${a.tracks||0}</div><div class='row'><button class='btn primary'>Изменить</button><button class='btn' style='background:#3a1416;color:#ffb4b4'>Удалить</button></div>`;
+      c.querySelector('.btn.primary').onclick = ()=> editArtist(a);
+      c.querySelectorAll('.btn')[1].onclick = ()=> delArtist(a);
+      list.appendChild(c);
+    });
+  }
+  if (tab==='albums'){
+    items.forEach(al=>{
+      const c=document.createElement('div'); c.className='card';
+      c.innerHTML = `${img(al.cover)}<h3>${esc(al.album||'Без названия')}</h3><div class='small'>Артист: ${esc(al.artist||'')}</div><div class='small'>Тип: ${esc(al.album_type||'')}</div><div class='small'>Треков: ${al.track_count||0}</div><div class='row'><button class='btn primary'>Изменить</button><button class='btn' style='background:#3a1416;color:#ffb4b4'>Удалить</button></div>`;
+      c.querySelector('.btn.primary').onclick = ()=> editAlbum(al);
+      c.querySelectorAll('.btn')[1].onclick = ()=> delAlbum(al);
+      list.appendChild(c);
+    });
+  }
+  if (tab==='tracks'){
+    items.forEach(t=>{
+      const c=document.createElement('div'); c.className='card';
+      const featsLine = t.feats && String(t.feats).trim() ? `<div class='small'>Фиты: ${esc(t.feats)}</div>` : '';
+      const hasVideo = !!(t.video_url && String(t.video_url).trim());
+      const genreLine = t.genre && String(t.genre).trim() ? `<div class='small'>Жанр: ${esc(t.genre)}</div>` : '';
+      c.innerHTML = `${img(t.cover)}<h3>${esc(t.title||'Без названия')}</h3><div class='small'>Артист: ${esc(t.artist||'')}</div>${featsLine}${genreLine}<div class='small'>Альбом: ${esc(t.album||'')}</div><div class='small'>Файл: ${esc(t.file_path||'')}</div><div class='small'>Видео: ${hasVideo ? '<span style="color:#8aff8a">есть</span>' : 'нет'}</div><div class='row'><button class='btn primary' data-edit='1'>Изменить</button>${hasVideo ? "<button class='btn' data-preview='1'>Видео</button>" : ''}<button class='btn' data-del='1' style='background:#3a1416;color:#ffb4b4'>Удалить</button></div>`;
+      c.querySelector('[data-edit]').onclick = () => editTrack(t);
+      if (hasVideo) c.querySelector('[data-preview]').onclick = () => openVideoPreview(t.video_url);
+      c.querySelector('[data-del]').onclick = () => delTrack(t);
+      list.appendChild(c);
+    });
+  }
+
+  ensureLoadMoreButton();
+}
+
+function ensureLoadMoreButton(){
+  if (tab === 'reports') {
+    const old = document.getElementById('load-more');
+    if (old) old.style.display = 'none';
+    return;
+  }
+  // Simple "Load more" button at the end of the list
+  let btn = document.getElementById('load-more');
+  if (!btn){
+    btn = document.createElement('button');
+    btn.id = 'load-more';
+    btn.className = 'btn';
+    btn.style.cssText = 'margin:12px; width:calc(100% - 24px)';
+    btn.textContent = 'Загрузить ещё';
+    btn.onclick = ()=> load({ reset:false });
+    document.body.appendChild(btn);
+  }
+  btn.style.display = paging.done ? 'none' : 'block';
+}
+
+function formatSeconds(sec){
+  sec = Number(sec) || 0;
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h} ч ${m} мин`;
+  return `${m} мин`;
+}
+
+function formatDt(dt){
+  const s = String(dt || '').trim();
+  if (!s) return '';
+  // Keep DB time as-is (no timezone conversion in browser)
+  // Supports:
+  // - "YYYY-MM-DD HH:MM:SS"
+  // - "YYYY-MM-DDTHH:MM:SS(.sss)?(Z|+03:00)"
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  if (m) return `${m[3]}.${m[2]}.${m[1]} ${m[4]}:${m[5]}`;
+  return s;
+}
+
+function formatDateOnly(ymd){
+  const s = String(ymd || '').trim();
+  if (!s) return '';
+  const p = s.split('-');
+  if (p.length === 3) return `${p[2]}.${p[1]}`;
+  return s;
+}
+
+function toCoverSrcPublic(p){
+  const s = String(p||'').trim();
+  if (!s) return '/muzic2/tracks/covers/placeholder.jpg';
+  if (/^https?:\/\//i.test(s) || s.startsWith('data:')) return s;
+  if (s.startsWith('/muzic2/')) return s;
+  if (s.startsWith('/')) return '/muzic2' + s;
+  return '/muzic2/' + s.replace(/^\/+/, '');
+}
+
+async function loadReports(){
+  // UI: hide search/add, show report controls
+  if (search) search.style.display = 'none';
+  if (add) add.style.display = 'none';
+  ok('Загрузка отчётов...');
+  list.className = 'list';
+  list.style.gridTemplateColumns = '1fr';
+  list.innerHTML = `
+    <div class="card">
+      <h3>Отчёты</h3>
+      <div class="small">Период и лимиты</div>
+      <div class="row" style="flex-wrap:wrap; align-items:flex-end">
+        <div style="min-width:200px">
+          <div class="small">Период</div>
+          <select id="rep-period" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0f1113;color:#fff">
+            <option value="day">День</option>
+            <option value="week">Неделя</option>
+            <option value="month" selected>Месяц</option>
+            <option value="year">Год</option>
+            <option value="all">Всё время</option>
+          </select>
+        </div>
+        <div style="min-width:160px">
+          <div class="small">Лимит (топ)</div>
+          <input id="rep-limit" type="number" min="5" max="50" value="${reportsState.limit}" />
+        </div>
+        <button class="btn primary" id="rep-refresh">Обновить</button>
+      </div>
+    </div>
+    <div class="card" id="rep-summary"><h3>Сводка</h3><div class="small">Загрузка…</div></div>
+    <div class="card" id="rep-activity">
+      <h3>Активность (30 дней)</h3>
+      <div class="small">Наведите на столбик, чтобы увидеть дату и время</div>
+      <div style="position:relative">
+        <canvas id="rep-chart" width="1000" height="260" style="width:100%;height:260px;background:#0f1113;border:1px solid var(--border);border-radius:12px"></canvas>
+        <div id="rep-tip" style="position:absolute;display:none;pointer-events:none;background:#121317;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:12px;color:#e6e6e6;max-width:260px;box-shadow:0 10px 40px rgba(0,0,0,.35)"></div>
+      </div>
+    </div>
+    <div class="card" id="rep-top-tracks"><h3>Топ треков</h3><div class="small">Загрузка…</div></div>
+    <div class="card" id="rep-top-artists"><h3>Топ артистов</h3><div class="small">Загрузка…</div></div>
+  `;
+
+  const periodSel = document.getElementById('rep-period');
+  const limitInp = document.getElementById('rep-limit');
+  const refreshBtn = document.getElementById('rep-refresh');
+  if (periodSel) periodSel.value = reportsState.period;
+  if (refreshBtn) refreshBtn.onclick = () => {
+    reportsState.period = periodSel ? periodSel.value : 'month';
+    reportsState.limit = Math.max(5, Math.min(50, Number(limitInp && limitInp.value) || 10));
+    loadReports().catch(()=>{});
+  };
+
+  const qs = new URLSearchParams({
+    period: reportsState.period,
+    type: 'all',
+    limit: String(reportsState.limit),
+  }).toString();
+  const r = await fetch(`${API.stats}?${qs}`, { credentials:'include' });
+  const j = await readJsonSafe(r);
+  if (!j || j.error) throw new Error((j && j.error) || 'Ошибка отчётов');
+
+  // Summary
+  const sum = j.summary || {};
+  const sumEl = document.getElementById('rep-summary');
+  if (sumEl) {
+    sumEl.innerHTML = `
+      <h3>Сводка</h3>
+      <div class="row" style="flex-wrap:wrap">
+        <div class="card" style="flex:1;min-width:220px"><div class="small">Прослушиваний</div><div style="font-size:28px;font-weight:900">${Number(sum.total_plays||0)}</div></div>
+        <div class="card" style="flex:1;min-width:220px"><div class="small">Время</div><div style="font-size:28px;font-weight:900">${formatSeconds(sum.total_time||0)}</div></div>
+        <div class="card" style="flex:1;min-width:220px"><div class="small">Уникальных треков</div><div style="font-size:28px;font-weight:900">${Number(sum.unique_tracks||0)}</div></div>
+        <div class="card" style="flex:1;min-width:220px"><div class="small">Уникальных артистов</div><div style="font-size:28px;font-weight:900">${Number(sum.unique_artists||0)}</div></div>
+      </div>
+    `;
+  }
+
+  // Activity chart (simple bars)
+  const activity = Array.isArray(j.activity) ? j.activity : [];
+  const canvas = document.getElementById('rep-chart');
+  if (canvas && canvas.getContext) {
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = '#0f1113';
+    ctx.fillRect(0,0,W,H);
+    const vals = activity.map(a=>Number(a.plays||a.play_count||0)||0);
+    const maxV = Math.max(1, ...vals);
+    const pad = 18;
+    const labelH = 28;
+    const baseY = H - pad - labelH;
+    const bw = Math.max(2, Math.floor((W - pad*2) / Math.max(1, vals.length)));
+    for (let i=0;i<vals.length;i++){
+      const v = vals[i];
+      const bh = Math.round((baseY - pad) * (v / maxV));
+      const x = pad + i*bw;
+      const y = baseY - bh;
+      ctx.fillStyle = '#1ed760';
+      ctx.fillRect(x, y, Math.max(1, bw-2), bh);
+    }
+    // x labels (dates) every Nth bar
+    ctx.fillStyle = '#a0a6ad';
+    ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Arial';
+    const step = Math.max(1, Math.ceil(vals.length / 8));
+    for (let i=0;i<activity.length;i+=step){
+      const a = activity[i];
+      const label = formatDateOnly(a && a.date);
+      const x = pad + i*bw;
+      ctx.fillText(label, x, H - pad);
+    }
+    ctx.strokeStyle = '#2a2d32';
+    ctx.strokeRect(0.5,0.5,W-1,H-1);
+
+    // Hover tooltip with date/time + stats
+    const tip = document.getElementById('rep-tip');
+    const hit = (mx, my) => {
+      if (!vals.length) return -1;
+      if (mx < pad || mx > W - pad) return -1;
+      if (my < pad || my > baseY + 2) return -1;
+      const i = Math.floor((mx - pad) / bw);
+      if (i < 0 || i >= vals.length) return -1;
+      return i;
+    };
+    const setTip = (e, idx) => {
+      if (!tip) return;
+      if (idx < 0) { tip.style.display = 'none'; return; }
+      const a = activity[idx] || {};
+      const plays = Number(a.plays||a.play_count||0) || 0;
+      const dur = Number(a.duration||a.total_duration||0) || 0;
+      // "time" here means current time of viewing; day stats are by date
+      const now = new Date();
+      const pad2 = (n)=> String(n).padStart(2,'0');
+      const nowStr = `${pad2(now.getDate())}.${pad2(now.getMonth()+1)}.${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+      tip.innerHTML = `
+        <div style="font-weight:900">${formatDateOnly(a.date)} (сейчас: ${nowStr})</div>
+        <div style="margin-top:4px">Прослушиваний: <b>${plays}</b></div>
+        <div>Время: <b>${formatSeconds(dur)}</b></div>
+      `;
+      tip.style.display = 'block';
+      // position relative to container
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      const left = Math.max(8, Math.min(rect.width - 220, cx + 12));
+      const top = Math.max(8, Math.min(rect.height - 70, cy + 12));
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    };
+    canvas.onmousemove = (e)=>{
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (W / rect.width);
+      const my = (e.clientY - rect.top) * (H / rect.height);
+      setTip(e, hit(mx, my));
+    };
+    canvas.onmouseleave = ()=>{ if (tip) tip.style.display = 'none'; };
+  }
+
+  // Top tracks table
+  const tracks = Array.isArray(j.tracks) ? j.tracks : [];
+  const tt = document.getElementById('rep-top-tracks');
+  if (tt) {
+    const rows = tracks.map((t, i)=>`
+      <tr>
+        <td class="small" style="padding:8px 6px">${i+1}</td>
+        <td style="padding:8px 6px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <img src="${toCoverSrcPublic(t.cover)}" style="width:42px;height:42px;border-radius:10px;object-fit:cover;border:1px solid var(--border)" onerror="this.onerror=null;this.src='/muzic2/tracks/covers/placeholder.jpg'">
+            <div>
+              <div style="font-weight:800">${esc(t.title||'')}</div>
+              <div class="small">${esc(t.artist||'')}</div>
+            </div>
+          </div>
+        </td>
+        <td class="small" style="padding:8px 6px;text-align:right">${Number(t.play_count||0)}</td>
+        <td class="small" style="padding:8px 6px;text-align:right;white-space:nowrap">${esc(formatDt(t.last_played||''))}</td>
+      </tr>
+    `).join('');
+    tt.innerHTML = `
+      <h3>Топ треков</h3>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr><th class="small" style="text-align:left;padding:8px 6px">#</th><th class="small" style="text-align:left;padding:8px 6px">Трек</th><th class="small" style="text-align:right;padding:8px 6px">Прослуш.</th><th class="small" style="text-align:right;padding:8px 6px">Последнее</th></tr></thead>
+        <tbody>${rows || `<tr><td class="small" style="padding:8px 6px" colspan="4">Нет данных</td></tr>`}</tbody>
+      </table>
+    `;
+  }
+
+  // Top artists table
+  const artists = Array.isArray(j.artists) ? j.artists : [];
+  const ta = document.getElementById('rep-top-artists');
+  if (ta) {
+    const rows = artists.map((a, i)=>`
+      <tr>
+        <td class="small" style="padding:8px 6px">${i+1}</td>
+        <td style="padding:8px 6px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <img src="${toCoverSrcPublic(a.cover)}" style="width:42px;height:42px;border-radius:999px;object-fit:cover;border:1px solid var(--border)" onerror="this.onerror=null;this.src='/muzic2/tracks/covers/placeholder.jpg'">
+            <div style="font-weight:800">${esc(a.name||'')}</div>
+          </div>
+        </td>
+        <td class="small" style="padding:8px 6px;text-align:right">${Number(a.play_count||0)}</td>
+        <td class="small" style="padding:8px 6px;text-align:right;white-space:nowrap">${esc(formatDt(a.last_played||''))}</td>
+      </tr>
+    `).join('');
+    ta.innerHTML = `
+      <h3>Топ артистов</h3>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr><th class="small" style="text-align:left;padding:8px 6px">#</th><th class="small" style="text-align:left;padding:8px 6px">Артист</th><th class="small" style="text-align:right;padding:8px 6px">Прослуш.</th><th class="small" style="text-align:right;padding:8px 6px">Последнее</th></tr></thead>
+        <tbody>${rows || `<tr><td class="small" style="padding:8px 6px" colspan="4">Нет данных</td></tr>`}</tbody>
+      </table>
+    `;
+  }
+
+  ok('Отчёты загружены');
+}
+
+function openModal(title, html, it){ mtitle.textContent=title; mbody.innerHTML=html; mstatus.textContent=''; modal.style.display='flex'; current = it || null; }
+function closeModal(){ modal.style.display='none'; current=null; }
+closeBtn.onclick = closeModal;
+
+async function upload(file){ const fd=new FormData(); fd.append('cover', file); const r=await fetch(API.upload,{method:'POST',body:fd}); const j=await readJsonSafe(r); if(!r.ok||!j||!j.success) throw new Error((j&&j.message)||'Ошибка загрузки'); return j.path; }
+async function uploadVideo(file){ const fd=new FormData(); fd.append('video', file); const r=await fetch(API.uploadVideo,{method:'POST',body:fd}); const j=await readJsonSafe(r); if(!r.ok||!j||!j.success) throw new Error((j&&j.message)||'Ошибка загрузки'); return j.path; }
+function normVideo(v){ return String(v||'').trim(); }
+function videoSrcForPreview(raw){
+  const url = normVideo(raw); if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  const rel = (url.indexOf('tracks/') !== -1) ? url.slice(url.indexOf('tracks/')) : url.replace(/^\/+/, '');
+  return '/muzic2/public/src/api/video.php?f=' + encodeURIComponent(rel);
+}
+function openVideoPreview(raw){
+  const url = videoSrcForPreview(raw);
+  if (!url) { alert('Видео не указано'); return; }
+  let overlay = document.getElementById('video-preview');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'video-preview';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100000';
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#0f0f0f;border:1px solid #2a2a2a;border-radius:12px;max-width:800px;width:92%;padding:8px;position:relative';
+    const close = document.createElement('button');
+    close.textContent = '×';
+    close.onclick = () => { try { v.pause(); } catch(_) {} document.body.removeChild(overlay); };
+    const v = document.createElement('video');
+    v.id = 'video-preview-player';
+    v.style.cssText = 'width:100%;height:auto;max-height:70vh;background:#000';
+    v.controls = true;
+    box.appendChild(close);
+    box.appendChild(v);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  }
+  const vp = document.getElementById('video-preview-player');
+  if (vp) {
+    try { while (vp.firstChild) vp.removeChild(vp.firstChild); } catch(_) {}
+    const s = document.createElement('source');
+    s.src = url;
+    s.type = url.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4';
+    vp.appendChild(s);
+    vp.load();
+    setTimeout(() => { try { vp.play().catch(()=>{}); } catch(_) {} }, 0);
+  }
+}
+async function loadGenreOptions(){
+  if (genreOptionsLoaded) return;
+  try {
+    const r = await fetch(API.genres);
+    const j = await readJsonSafe(r);
+    if (j && j.success) genreOptions = j.data || [];
+  } catch(_) { genreOptions = []; }
+  genreOptionsLoaded = true;
+}
+function genreDatalistHtml(){
+  return `<datalist id="genre-list">${(genreOptions||[]).map(g => `<option value="${esc(g)}"></option>`).join('')}</datalist>`;
+}
+
+async function loadArtistSuggestions(force){
+  if (!force && artistSuggestionsLoaded) return artistSuggestions;
+  const names = new Set();
+  let after = '';
+  let guard = 0;
+  try {
+    while (guard < 8) {
+      guard += 1;
+      const qs = [`limit=200`];
+      if (after) qs.push(`after=${encodeURIComponent(after)}`);
+      const res = await fetch(`${API.artists}?${qs.join('&')}`);
+      const data = await readJsonSafe(res);
+      const rows = (data && data.success && Array.isArray(data.data)) ? data.data : [];
+      rows.forEach((r)=>{
+        const nm = String((r && r.artist) || '').trim();
+        if (nm) names.add(nm);
+      });
+      const next = data && data.next_after ? String(data.next_after) : '';
+      if (!next || rows.length === 0) break;
+      after = next;
+    }
+  } catch(_) {}
+  artistSuggestions = Array.from(names).sort((a,b)=>a.localeCompare(b,'ru'));
+  artistSuggestionsLoaded = true;
+  return artistSuggestions;
+}
+
+function bindArtistSuggestionsToTrackModal(){
+  const dl = document.getElementById('artist-suggestions');
+  if (!dl) return;
+  loadArtistSuggestions(false).then((list)=>{
+    if (!Array.isArray(list) || !list.length) return;
+    dl.innerHTML = list.map((name)=>`<option value="${esc(name)}"></option>`).join('');
+  }).catch(()=>{});
+}
+
+async function editArtist(a){
+  // Load artist tracks for promo track selection
+  let tracksOptions = '<option value="">— Не выбран —</option>';
+  try {
+    const tracksRes = await fetch(`${API.tracks}?q=${encodeURIComponent(a.artist||'')}`);
+    const tracksData = await readJsonSafe(tracksRes);
+    if (tracksData.success && Array.isArray(tracksData.data)) {
+      tracksData.data.forEach(t => {
+        const selected = a.promo_track_id && t.id == a.promo_track_id ? 'selected' : '';
+        tracksOptions += `<option value="${t.id}" ${selected}>${esc(t.title||'Без названия')}${t.album ? ' — ' + esc(t.album) : ''}</option>`;
+      });
+    }
+  } catch(e) {
+    console.warn('Failed to load tracks:', e);
+  }
+  openModal('Изменить артиста', `
+    <div class='field'><label>Имя</label><input id='f-name' value='${esc(a.artist||'')}'></div>
+    <div class='field'><label>Фото (путь или загрузите)</label><div style='display:flex;gap:8px'><input id='f-cover' value='${esc(a.artist_cover||a.track_cover||'')}' style='flex:1'><input id='f-file' type='file' accept='image/*' style='flex:1'></div></div>
+    <div class='field'><label>Видео-промо/Интро (путь или загрузите)</label><div style='display:flex;gap:8px'><input id='f-promo-video' value='${esc(a.promo_video||'')}' style='flex:1' placeholder='tracks/videos/promo.mp4'><input id='f-video-file' type='file' accept='video/*' style='flex:1'></div><div style='font-size:12px;color:var(--muted);margin-top:4px'>Поддерживаются: MP4, WEBM, MOV, AVI (до 100 МБ)</div></div>
+    <div class='field'><label>Трек для промо (отображается в интро)</label><select id='f-promo-track' style='width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);background:#0f1113;color:#fff'>${tracksOptions}</select><div style='font-size:12px;color:var(--muted);margin-top:4px'>Выберите трек, который будет показан в промо-видео</div></div>
+    <div class='field'><label>Био</label><textarea id='f-bio' rows='4'>${esc(a.bio||'')}</textarea></div>
+  `, a);
+  saveBtn.onclick = async ()=>{
+    try{
+      mok('Сохранение...');
+      let cover = document.getElementById('f-cover').value.trim();
+      const file = document.getElementById('f-file').files[0];
+      if (file){ cover = await upload(file); document.getElementById('f-cover').value = cover; }
+      let promoVideo = document.getElementById('f-promo-video').value.trim();
+      const videoFile = document.getElementById('f-video-file').files[0];
+      if (videoFile){ promoVideo = await uploadVideo(videoFile); document.getElementById('f-promo-video').value = promoVideo; }
+      const promoTrackId = document.getElementById('f-promo-track').value || null;
+      const payload = { action:'update', name: a.artist, name_new: document.getElementById('f-name').value.trim(), cover, bio: document.getElementById('f-bio').value.trim(), promo_video: promoVideo, promo_track_id: promoTrackId };
+      const r = await fetch(API.artists, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      const j = await readJsonSafe(r); if(!j || !j.success) throw new Error((j&&j.message)||'Ошибка');
+      closeModal(); load();
+    }catch(e){ merr(e.message) }
+  };
+}
+
+function editAlbum(al){
+  openModal('Изменить альбом', `
+    <div class='field'><label>Альбом</label><input id='f-album' value='${esc(al.album||'')}'></div>
+    <div class='field'><label>Артист</label><input id='f-artist' value='${esc(al.artist||'')}'></div>
+    <div class='field'><label>Тип</label><select id='f-type'><option value='album' ${al.album_type==='album'?'selected':''}>Альбом</option><option value='ep' ${al.album_type==='ep'?'selected':''}>EP</option><option value='single' ${al.album_type==='single'?'selected':''}>Сингл</option></select></div>
+    <div class='field'><label>Обложка (путь или загрузите)</label><div style='display:flex;gap:8px'><input id='f-cover' value='${esc(al.cover||'')}' style='flex:1'><input id='f-file' type='file' accept='image/*' style='flex:1'></div></div>
+    <div class='field'><label>Фиты для всех треков альбома (через запятую)</label><input id='f-feats' value='' placeholder='Kai Angel, 9mice'></div>
+  `, al);
+  saveBtn.onclick = async ()=>{
+    try{
+      mok('Сохранение...');
+      let cover = document.getElementById('f-cover').value.trim();
+      const file = document.getElementById('f-file').files[0];
+      if (file){ cover = await upload(file); document.getElementById('f-cover').value = cover; }
+      const payload = { action:'update', album: al.album, album_new: document.getElementById('f-album').value.trim(), artist: document.getElementById('f-artist').value.trim(), album_type: document.getElementById('f-type').value, cover, feats: document.getElementById('f-feats').value.trim() };
+      const r = await fetch(API.albums, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      const j = await readJsonSafe(r); if(!j || !j.success) throw new Error((j&&j.message)||'Ошибка');
+      closeModal(); load();
+    }catch(e){ merr(e.message) }
+  };
+}
+
+async function editTrack(t){
+  await loadGenreOptions();
+  openModal(t.id ? 'Изменить трек' : 'Новый трек', `
+    ${genreDatalistHtml()}
+    <div class='field'><label>Название</label><input id='f-title' value='${esc(t.title||'')}'></div>
+    <div class='field'><label>Артист</label><input id='f-artist' list='artist-suggestions' value='${esc(t.artist||'')}' placeholder='Начните вводить имя артиста'><datalist id='artist-suggestions'></datalist><div style='font-size:12px;color:var(--muted);margin-top:4px'>Выберите из списка, чтобы избежать опечаток</div></div>
+    <div class='field'><label>Фиты (через запятую)</label><input id='f-feats' value='${esc(t.feats||'')}' placeholder='Kai Angel, 9mice'><div style='font-size:12px;color:var(--muted);margin-top:4px'>Доп. исполнители появятся в своих карточках артистов с этим треком</div></div>
+    <div class='field'><label>Альбом</label><input id='f-album' value='${esc(t.album||'')}'></div>
+    <div class='field'><label>Жанр</label><input id='f-genre' list='genre-list' value='${esc(t.genre||'')}' placeholder='Рэп, Поп, Rock...'></div>
+    <div class='field'><label>Тип</label><select id='f-type'><option value='album' ${t.album_type==='album'?'selected':''}>Альбом</option><option value='ep' ${t.album_type==='ep'?'selected':''}>EP</option><option value='single' ${t.album_type==='single'?'selected':''}>Сингл</option></select></div>
+    <div class='field'><label>Файл (tracks/music/...)</label><input id='f-file' value='${esc(t.file_path||'')}'></div>
+    <div class='field'><label>Обложка (путь или загрузите)</label><div style='display:flex;gap:8px'><input id='f-cover' value='${esc(t.cover||'')}' style='flex:1'><input id='f-file2' type='file' accept='image/*' style='flex:1'></div></div>
+    <div class='field'><label>Длительность (сек)</label><input id='f-dur' type='number' value='${t.duration||0}'></div>
+    <div class='field'><label>Нецензурная лексика</label><label style='display:inline-flex;align-items:center;gap:8px'><input id='f-exp' type='checkbox' ${t.explicit ? 'checked' : ''}> Показать значок E</label></div>
+    <div class='field'><label>Клип к треку</label><div style='display:flex;gap:8px;flex-wrap:wrap'><input id='f-video' value='${esc(t.video_url||'')}' placeholder='tracks/videos/file.mp4 или URL' style='flex:1;min-width:220px'><input id='f-video-file' type='file' accept='video/*' style='flex:1;min-width:180px'><button class='btn' id='preview-video-btn' type='button'>Проверить</button></div><div class='small' style='margin-top:6px'>MP4, WEBM, MOV до 100 МБ</div></div>
+  `, t);
+  bindArtistSuggestionsToTrackModal();
+  const previewBtn = document.getElementById('preview-video-btn');
+  if (previewBtn) previewBtn.onclick = () => openVideoPreview(document.getElementById('f-video').value || '');
+  const videoFileInput = document.getElementById('f-video-file');
+  if (videoFileInput) {
+    videoFileInput.onchange = async () => {
+      const vf = videoFileInput.files[0];
+      if (!vf) return;
+      try {
+        mok('Загрузка видео...');
+        const path = await uploadVideo(vf);
+        document.getElementById('f-video').value = path;
+        mok('Видео загружено');
+      } catch (e) { merr(e.message); }
+    };
+  }
+  saveBtn.onclick = async ()=>{
+    try{
+      mok('Сохранение...');
+      let cover = document.getElementById('f-cover').value.trim();
+      const file = document.getElementById('f-file2').files[0];
+      if (file){ cover = await upload(file); document.getElementById('f-cover').value = cover; }
+      let video_url = normVideo(document.getElementById('f-video').value);
+      const videoFile = document.getElementById('f-video-file')?.files?.[0];
+      if (videoFile) {
+        video_url = normVideo(await uploadVideo(videoFile));
+        document.getElementById('f-video').value = video_url;
+      }
+      const isCreate = !t.id || t.id === 0;
+      const base = {
+        title: document.getElementById('f-title').value.trim(),
+        artist: document.getElementById('f-artist').value.trim(),
+        feats: document.getElementById('f-feats').value.trim(),
+        album: document.getElementById('f-album').value.trim(),
+        genre: document.getElementById('f-genre').value.trim(),
+        album_type: document.getElementById('f-type').value,
+        file_path: document.getElementById('f-file').value.trim(),
+        cover,
+        duration: parseInt(document.getElementById('f-dur').value||0,10),
+        explicit: !!document.getElementById('f-exp').checked,
+        video_url
+      };
+      const payload = isCreate ? ({ action:'create', ...base }) : ({ action:'update', id: t.id, ...base });
+      const r = await fetch(API.tracks, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      const j = await readJsonSafe(r); if(!j || !j.success) throw new Error((j&&j.message)||'Ошибка');
+      genreOptionsLoaded = false;
+      closeModal(); load({reset:true});
+    }catch(e){ merr(e.message) }
+  };
+}
+
+async function delTrack(t){
+  if (!confirm(`Удалить трек "${t.title}"?`)) return;
+  const r = await fetch(API.tracks, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'delete', id: t.id})});
+  const j = await readJsonSafe(r);
+  if (j && j.success){ ok('Трек удалён'); load(); } else { err((j&&j.message)||'Ошибка') }
+}
+
+async function delArtist(a){
+  if (!confirm(`Удалить артиста "${a.artist}"?`)) return;
+  const r = await fetch(API.artists, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'delete', name: a.artist})});
+  const j = await readJsonSafe(r);
+  if (j && j.success){ ok('Артист удалён'); load(); } else { err((j&&j.message)||'Ошибка') }
+}
+
+async function delAlbum(al){
+  if (!confirm(`Удалить альбом "${al.album}" от "${al.artist}"?`)) return;
+  const r = await fetch(API.albums, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({action:'delete', album: al.album})});
+  const j = await readJsonSafe(r);
+  if (j && j.success){ ok('Альбом удалён'); load(); } else { err((j&&j.message)||'Ошибка') }
+}
+
+add.onclick = async ()=>{
+  if (tab === 'reports') return;
+  if (tab==='artists'){
+    await editArtist({artist:'',artist_cover:'',bio:'',promo_video:'',promo_track_id:null});
+    document.getElementById('f-name').value = '';
+    saveBtn.onclick = async ()=>{
+      try{
+        mok('Сохранение...');
+        let cover = document.getElementById('f-cover').value.trim();
+        const file = document.getElementById('f-file').files[0];
+        if (file){ cover = await upload(file); document.getElementById('f-cover').value = cover; }
+        let promoVideo = document.getElementById('f-promo-video').value.trim();
+        const videoFile = document.getElementById('f-video-file').files[0];
+        if (videoFile){ promoVideo = await uploadVideo(videoFile); document.getElementById('f-promo-video').value = promoVideo; }
+        const promoTrackId = document.getElementById('f-promo-track') ? (document.getElementById('f-promo-track').value || null) : null;
+        const payload = { action:'create', name: document.getElementById('f-name').value.trim(), cover, bio: document.getElementById('f-bio').value.trim(), promo_video: promoVideo, promo_track_id: promoTrackId };
+        const r = await fetch(API.artists, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+        const j = await readJsonSafe(r); if(!j || !j.success) throw new Error((j&&j.message)||'Ошибка');
+        closeModal(); load();
+      }catch(e){ merr(e.message) }
+    };
+  }
+  else if (tab==='albums'){
+    editAlbum({album:'',artist:'',album_type:'album',cover:''});
+  }
+  else if (tab==='tracks'){
+    editTrack({id:0,title:'',artist:'',feats:'',album:'',album_type:'album',file_path:'',cover:'',duration:0,genre:'',video_url:'',explicit:0});
+  }
+};
+
+const refreshMixesBtn = document.getElementById('refresh-mixes');
+if (refreshMixesBtn) {
+  refreshMixesBtn.onclick = async () => {
+    try {
+      ok('Обновление миксов дня...');
+      const r = await fetch(API.home, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'refresh_mood_mixes' }) });
+      const j = await readJsonSafe(r);
+      if (!j || !j.success) throw new Error((j && j.message) || 'Ошибка');
+      ok(j.message || 'Миксы дня обновлены');
+    } catch (e) { err(e.message || 'Ошибка'); }
+  };
+}
+
+document.querySelectorAll('.tab').forEach(b=> b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  tab = b.dataset.tab;
+  // restore controls when leaving reports
+  const refreshMixesBtn = document.getElementById('refresh-mixes');
+  if (tab === 'reports') {
+    if (search) search.style.display = 'none';
+    if (add) add.style.display = 'none';
+    if (refreshMixesBtn) refreshMixesBtn.style.display = 'none';
+  } else {
+    if (search) search.style.display = '';
+    if (add) add.style.display = '';
+    if (refreshMixesBtn) refreshMixesBtn.style.display = '';
+    list.style.gridTemplateColumns = '';
+  }
+  load({reset:true});
+});
+search.oninput = ()=>{ clearTimeout(search._t); search._t = setTimeout(()=>load({reset:true}), 300); };
+
+load({reset:true});
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Добавление артиста</title>
+  <style>
+    :root { --primary:#667eea; --primary2:#764ba2; --bg:#f5f7fb; --card:#fff; --text:#333; --muted:#6b7280; --border:#e5e7eb; --danger:#dc3545; }
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;margin:0;padding:24px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary2) 100%)}
+    .container{max-width:900px;margin:0 auto;background:var(--card);border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+    h1{margin:0 0 8px;text-align:center}
+    .subtitle{text-align:center;color:var(--muted);margin:0 0 16px}
+    .card{border:1px solid var(--border);border-radius:12px;padding:16px;background:#fff;margin-bottom:12px}
+    .form-group{margin-bottom:12px}
+    label{display:block;font-weight:600;margin-bottom:6px;color:#374151}
+    input[type=text],textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;outline:none}
+    input:focus,textarea:focus{border-color:var(--primary)}
+    textarea{min-height:90px;resize:vertical}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--primary);color:#fff;border:none;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:600}
+    .btn.small{padding:8px 12px;border-radius:8px}
+    .muted{color:var(--muted);font-size:13px}
+    .upload-area{background:#f9fafb;border:1px dashed var(--border);padding:12px;border-radius:10px;margin:10px 0 12px}
+    .preview{display:flex;align-items:center;gap:12px}
+    .avatar{width:160px;height:160px;border-radius:12px;object-fit:cover;border:1px solid var(--border);background:#eee}
+    .success{background:#ecfdf5;border:1px solid #10b981;color:#065f46;padding:10px 12px;border-radius:8px}
+    .error{background:#fef2f2;border:1px solid #ef4444;color:#991b1b;padding:10px 12px;border-radius:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>👤 Добавить артиста</h1>
+    <p class="subtitle">Имя и фото артиста. После отправки он появится на сайте в списке артистов.</p>
+
+    <div class="card">
+      <div class="muted">Совет: фото храните в каталоге <code>tracks/covers/</code>. Путь указывайте относительно корня, например <code>tracks/covers/artist.jpg</code>.</div>
+    </div>
+
+    <form id="artistForm">
+      <div class="card">
+        <div class="form-group">
+          <label for="artistName">Имя артиста *</label>
+          <input id="artistName" type="text" required />
+        </div>
+        <div class="form-group">
+          <label for="artistBio">Био (необязательно)</label>
+          <textarea id="artistBio" placeholder="Краткая информация об артисте"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <label>Фото артиста *</label>
+        <input type="hidden" id="selectedCover" required />
+        <div class="upload-area">
+          <div class="form-group" style="margin:0;">
+            <label for="coverFile" style="margin-bottom:8px;">Загрузите фото (JPG, PNG, WEBP, GIF, до 15 МБ)</label>
+            <input type="file" id="coverFile" accept="image/*" />
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+            <button type="button" class="btn" id="uploadBtn">Загрузить</button>
+            <span class="muted">После загрузки фото автоматически выберется</span>
+          </div>
+          <div id="uploadStatus" class="muted" style="margin-top:6px;"></div>
+          <div class="preview" id="uploadedPreview" style="display:none;margin-top:10px;">
+            <img id="uploadedCoverImg" class="avatar" src="" alt="Фото артиста" />
+            <div>
+              <div class="muted" id="uploadedCoverName"></div>
+              <div class="muted" id="uploadedCoverPath"></div>
+            </div>
+          </div>
+        </div>
+        <div class="muted">Или укажите путь вручную:</div>
+        <input type="text" id="manualCover" placeholder="tracks/covers/artist.jpg" />
+      </div>
+
+      <div class="card">
+        <button type="submit" class="btn">✅ Сохранить артиста</button>
+        <div id="status" style="margin-top:10px;"></div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const coverFileInput = document.getElementById('coverFile');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadedPreview = document.getElementById('uploadedPreview');
+    const uploadedCoverImg = document.getElementById('uploadedCoverImg');
+    const uploadedCoverName = document.getElementById('uploadedCoverName');
+    const uploadedCoverPath = document.getElementById('uploadedCoverPath');
+    const selectedCoverInput = document.getElementById('selectedCover');
+    const manualCover = document.getElementById('manualCover');
+    const form = document.getElementById('artistForm');
+    const statusEl = document.getElementById('status');
+
+    function setUploadStatus(type, text){
+      uploadStatus.className = type ? type : 'muted';
+      uploadStatus.textContent = text || '';
+    }
+    function setStatus(type, text){
+      statusEl.className = type;
+      statusEl.textContent = text;
+    }
+
+    uploadBtn.addEventListener('click', async () => {
+      if (!coverFileInput.files || !coverFileInput.files[0]) {
+        setUploadStatus('error', 'Выберите файл');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('cover', coverFileInput.files[0]);
+      try {
+        uploadBtn.disabled = true; uploadBtn.textContent = 'Загрузка...';
+        setUploadStatus('muted', 'Загрузка...');
+        const res = await fetch('upload_cover.php', { method:'POST', body: formData });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Ошибка загрузки');
+        const rel = data.path; // tracks/covers/...
+        selectedCoverInput.value = rel;
+        uploadedCoverImg.src = '../' + rel;
+        uploadedCoverName.textContent = data.filename;
+        uploadedCoverPath.textContent = rel;
+        uploadedPreview.style.display = 'flex';
+        manualCover.value = rel;
+        setUploadStatus('success', 'Фото загружено и выбрано');
+      } catch (e) {
+        setUploadStatus('error', '❌ ' + e.message);
+      } finally {
+        uploadBtn.disabled = false; uploadBtn.textContent = 'Загрузить';
+      }
+    });
+
+    manualCover.addEventListener('input', () => {
+      const v = manualCover.value.trim();
+      selectedCoverInput.value = v;
+      if (v) {
+        uploadedCoverImg.src = '../' + v;
+        uploadedCoverName.textContent = v.split('/').pop();
+        uploadedCoverPath.textContent = v;
+        uploadedPreview.style.display = 'flex';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setStatus('', '');
+      const name = document.getElementById('artistName').value.trim();
+      const bio = document.getElementById('artistBio').value.trim();
+      const cover = selectedCoverInput.value.trim() || manualCover.value.trim();
+      if (!name) { setStatus('error', 'Укажите имя артиста'); return; }
+      if (!cover) { setStatus('error', 'Укажите фото артиста'); return; }
+      const payload = { artist_name: name, bio, cover };
+      try {
+        const res = await fetch('../add_artist_api.php', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Ошибка сохранения');
+        setStatus('success', 'Артист сохранён: ' + data.data.artist_name);
+        form.reset();
+        selectedCoverInput.value = '';
+        uploadedPreview.style.display = 'none';
+        uploadStatus.textContent = '';
+      } catch (e) {
+        setStatus('error', '❌ ' + e.message);
+      }
+    });
+  </script>
+</body>
+</html>

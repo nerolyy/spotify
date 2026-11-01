@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PWA Icons</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>PWA Icon Generator</h1>
+    <p>Откройте консоль браузера (F12) и выполните код для генерации иконок</p>
+    <canvas id="icon-canvas" width="512" height="512"></canvas>
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const canvas = document.getElementById('icon-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function generateIcon(size) {
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Фон
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#1db954');
+            gradient.addColorStop(1, '#17a74a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Текст "M2"
+            ctx.fillStyle = '#000';
+            ctx.font = `bold ${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('M2', size / 2, size / 2);
+            
+            return canvas.toDataURL('image/png');
+        }
+        
+        // Генерация всех размеров
+        sizes.forEach(size => {
+            const dataUrl = generateIcon(size);
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+        
+        console.log('Иконки сгенерированы! Сохраните их в /muzic2/public/assets/img/');
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

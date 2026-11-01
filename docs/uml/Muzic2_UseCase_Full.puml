@@ -1,0 +1,78 @@
+@startuml Muzic2_UseCase_Full
+left to right direction
+skinparam packageStyle rectangle
+title Диаграмма вариантов использования — Muzic2 (полная)
+
+actor Guest as "Гость"
+actor User as "Пользователь"
+actor Admin as "Администратор"
+
+rectangle "Клиентское приложение" {
+  usecase UC01 as "Просмотр главной\n(home_windows)"
+  usecase UC02 as "Пульс\n(персональный поток)"
+  usecase UC03 as "Поиск\n(search_windows)"
+  usecase UC04 as "Просмотр альбома\n(album_windows)"
+  usecase UC05 as "Просмотр артиста\n(artist_windows)"
+  usecase UC06 as "Моя музыка\n(лайки + плейлисты)"
+  usecase UC07 as "Создать плейлист"
+  usecase UC08 as "Удалить плейлист"
+  usecase UC09 as "Открыть плейлист"
+  usecase UC10 as "Лайк трека"
+  usecase UC11 as "Лайк альбома"
+  usecase UC12 as "Воспроизведение\n(player.js)"
+  usecase UC13 as "Очередь воспроизведения"
+  usecase UC14 as "Караоке / текст LRC\n(lyrics.php)"
+  usecase UC15 as "Продолжить слушать\n(localStorage)"
+  usecase UC16 as "Вход"
+  usecase UC17 as "Регистрация"
+  usecase UC18 as "Выход"
+  usecase UC19 as "Контекстное меню трека"
+  usecase UC20 as "Добавить трек\nв плейлист"
+}
+
+rectangle "Админ-панель" {
+  usecase UC30 as "CRUD артистов"
+  usecase UC31 as "CRUD альбомов"
+  usecase UC32 as "CRUD треков"
+  usecase UC33 as "Загрузка обложек"
+}
+
+Guest --> UC01
+Guest --> UC03
+Guest --> UC12
+
+User --> UC01
+User --> UC02
+User --> UC03
+User --> UC04
+User --> UC05
+User --> UC06
+User --> UC07
+User --> UC08
+User --> UC09
+User --> UC10
+User --> UC11
+User --> UC12
+User --> UC13
+User --> UC14
+User --> UC15
+User --> UC16
+User --> UC17
+User --> UC18
+User --> UC19
+User --> UC20
+
+Admin --> UC16
+Admin --> UC30
+Admin --> UC31
+Admin --> UC32
+Admin --> UC33
+
+UC02 ..> UC12 : include
+UC04 ..> UC12 : include
+UC06 ..> UC16 : include
+UC07 ..> UC16 : include
+UC14 ..> UC12 : include
+UC20 ..> UC06 : extend
+
+@enduml

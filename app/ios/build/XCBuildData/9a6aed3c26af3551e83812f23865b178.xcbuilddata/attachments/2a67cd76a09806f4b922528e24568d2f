@@ -1,0 +1,18 @@
+{
+  "" : {
+    "diagnostics" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/Muzic2App-master.dia",
+    "emit-module-dependencies" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/Muzic2App-master-emit-module.d",
+    "emit-module-diagnostics" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/Muzic2App-master-emit-module.dia",
+    "swift-dependencies" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/Muzic2App-master.swiftdeps"
+  },
+  "/Applications/MAMP/htdocs/muzic2/app/ios/Muzic2App/AppDelegate.swift" : {
+    "const-values" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.swiftconstvalues",
+    "dependencies" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.d",
+    "diagnostics" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.dia",
+    "index-unit-output-path" : "/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.o",
+    "llvm-bc" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.bc",
+    "object" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.o",
+    "swift-dependencies" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate.swiftdeps",
+    "swiftmodule" : "/Applications/MAMP/htdocs/muzic2/app/ios/build/Muzic2App.build/Debug-iphoneos/Muzic2App.build/Objects-normal/arm64/AppDelegate~partial.swiftmodule"
+  }
+}

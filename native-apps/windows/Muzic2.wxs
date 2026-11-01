@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="Muzic2" Language="1033" Version="1.0.0" Manufacturer="Muzic2" UpgradeCode="YOUR-GUID-HERE">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature" Title="Muzic2" Level="1">
+      <ComponentRef Id="ApplicationFiles" />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="Muzic2" />
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Application files -->
+      <Component Id="ApplicationFiles" Guid="YOUR-GUID-HERE">
+        <File Id="Muzic2Exe" Source="$(var.Muzic2.TargetPath)" KeyPath="yes" />
+        <!-- Add other files here -->
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
+

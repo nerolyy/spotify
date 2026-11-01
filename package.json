@@ -1,0 +1,38 @@
+{
+  "name": "muzic2-app",
+  "version": "1.0.0",
+  "description": "Muzic2 Desktop App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-mac": "electron-builder --mac",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "author": "Muzic2",
+  "license": "MIT",
+  "build": {
+    "appId": "com.muzic2.desktop",
+    "productName": "Muzic2",
+    "directories": { "output": "dist" },
+    "files": [
+      "main.js",
+      "preload.js",
+      "public/**/*",
+      "src/**/*",
+      "db/**/*",
+      "tracks/**/*",
+      "!node_modules",
+      "!dist"
+    ],
+    "mac": {
+      "category": "public.app-category.music",
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }]
+    },
+    "dmg": { "title": "Muzic2 Installer" }
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  }
+}
+
